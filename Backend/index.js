@@ -563,20 +563,28 @@ app.get("/getPostResponse", async (req, res) => {
   }
 });
 
+app.post("/getPostResponseWithFilter", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const results = parseInt(req.query.results) || 10;
+
+  try {
+    const data = await PostApiData.find({
+      imei: req.body.value,
+    })
+      .skip((page - 1) * results)
+      .limit(results);
+
+    const totalCount = await PostApiData.count({
+      imei: req.body.value,
+    });
+
+    res.json({ results: data, totalCount });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.post("/getPostResponseFilter", async (req, res) => {
-  // try {
-  // const result = await PostApiData.find({
-  //   createdAt: {
-  //     $gte: new Date(req.body.startDate),
-  //     $lte: new Date(req.body.endDate),
-  //   },
-  // });
-
-  //   res.status(200).json(result);
-  // } catch (error) {
-  //   res.status(500).json({ message: error.message });
-  // }
-
   const page = parseInt(req.query.page) || 1;
   const results = parseInt(req.query.results) || 10;
 

@@ -36,15 +36,22 @@ const PostDataShow = () => {
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
 
+  const [tableFilterType, setTableFilterType] = useState("");
+  const [tableFilterValue, setTableFilterValue] = useState("");
+  const [tableFilterCloseButton, setTableFilterCloseButton] = useState();
+
   const { RangePicker } = DatePicker;
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
+  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
+    getData(1, dataIndex, selectedKeys[0]);
     setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
+    // setSearchedColumn(dataIndex);
   };
 
   const handleReset = (clearFilters) => {
+    setTableFilterType("");
+    setTableFilterValue("");
+    getData();
     clearFilters();
     setSearchText("");
   };
@@ -68,13 +75,16 @@ const PostDataShow = () => {
         onKeyDown={(e) => e.stopPropagation()}
       >
         <Input
-          ref={searchInput}
+          // ref={searchInput}
           placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          // value={selectedKeys[0]}
+          onKeyUp={(e) => {
+            setSelectedKeys(e.target.value ? [e.target.value] : []);
+            console.log(dataIndex, e.target.value);
+            setTableFilterType(dataIndex);
+            setTableFilterValue(e.target.value);
+          }}
+          // onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{
             marginBottom: 8,
             display: "block",
@@ -83,7 +93,9 @@ const PostDataShow = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onClick={() =>
+              handleSearch(selectedKeys, confirm, dataIndex, close)
+            }
             icon={<SearchOutlined />}
             size="small"
             style={{
@@ -92,7 +104,7 @@ const PostDataShow = () => {
           >
             Search
           </Button>
-          <Button
+          {/* <Button
             onClick={() => clearFilters && handleReset(clearFilters)}
             size="small"
             style={{
@@ -100,7 +112,7 @@ const PostDataShow = () => {
             }}
           >
             Reset
-          </Button>
+          </Button> */}
           <Button
             type="link"
             size="small"
@@ -241,10 +253,54 @@ const PostDataShow = () => {
 
   const getData = () => {
     if (startDate === "" && endDate === "") {
-      filterDataWithoutDate();
+      if (tableFilterType === "" || tableFilterValue === "") {
+        filterDataWithoutDate();
+      } else {
+        getDataWithFilter();
+      }
     } else {
-      filterDataByDate();
+      if (tableFilterType === "" || tableFilterValue === "") {
+        console.log("if");
+        filterDataByDate();
+      } else {
+        console.log("else");
+        getDataWithFilter();
+      }
     }
+  };
+
+  const getDataWithFilter = () => {
+    setLoading(true);
+    axios
+      .post(
+        `${
+          process.env.REACT_APP_API_URL
+        }/getPostResponseWithFilter?${qs.stringify(
+          getRandomuserParams(tableParams)
+        )}`,
+        {
+          type: tableFilterType,
+          value: tableFilterValue,
+        }
+      )
+      .then((result) => {
+        let data = result.data.results;
+        let totalCount = result.data.totalCount;
+        console.log(data, totalCount);
+        // tableFilterCloseButton();
+        renderData(data);
+        setLoading(false);
+        setTableParams({
+          ...tableParams,
+          pagination: {
+            ...tableParams.pagination,
+            total: totalCount,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const filterDataWithoutDate = () => {
@@ -309,25 +365,25 @@ const PostDataShow = () => {
   };
 
   const columns = [
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (id) => {
-        return (
-          <div style={{ cursor: "pointer" }}>
-            <Popconfirm
-              title="Are you sure"
-              onConfirm={() => handleDelete(id)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <DeleteOutlined style={{ fontSize: "14px", color: "red" }} />
-            </Popconfirm>
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: "Action",
+    //   dataIndex: "action",
+    //   key: "action",
+    //   render: (id) => {
+    //     return (
+    //       <div style={{ cursor: "pointer" }}>
+    //         <Popconfirm
+    //           title="Are you sure"
+    //           onConfirm={() => handleDelete(id)}
+    //           okText="Yes"
+    //           cancelText="No"
+    //         >
+    //           <DeleteOutlined style={{ fontSize: "14px", color: "red" }} />
+    //         </Popconfirm>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       title: "No",
       dataIndex: "no",
@@ -345,301 +401,254 @@ const PostDataShow = () => {
       title: "APN",
       dataIndex: "apn",
       key: "apn",
-      ...getColumnSearchProps("apn"),
     },
     {
       title: "App Install",
       dataIndex: "app_install",
       key: "app_install",
-      ...getColumnSearchProps("app_install"),
     },
 
     {
       title: "Appdl",
       dataIndex: "appdl",
       key: "appdl",
-      ...getColumnSearchProps("appdl"),
     },
 
     {
       title: "Audio Current",
       dataIndex: "audio_current",
       key: "audio_current",
-      ...getColumnSearchProps("audio_current"),
     },
 
     {
       title: "Audio Voltage",
       dataIndex: "audio_voltage",
       key: "audio_voltage",
-      ...getColumnSearchProps("audio_voltage"),
     },
 
     {
       title: "Custom 1",
       dataIndex: "custom_1",
       key: "custom_1",
-      ...getColumnSearchProps("custom_1"),
     },
 
     {
       title: "Custom 2",
       dataIndex: "custom_2",
       key: "custom_2",
-      ...getColumnSearchProps("custom_2"),
     },
 
     {
       title: "Fail Reason",
       dataIndex: "fail_reason",
       key: "fail_reason",
-      ...getColumnSearchProps("fail_reason"),
     },
 
     {
       title: "File Cleanup",
       dataIndex: "file_cleanup",
       key: "file_cleanup",
-      ...getColumnSearchProps("file_cleanup"),
     },
 
     {
       title: "File List",
       dataIndex: "file_list",
       key: "file_list",
-      ...getColumnSearchProps("file_list"),
     },
 
     {
       title: "Fota Command",
       dataIndex: "fota_command",
       key: "fota_command",
-      ...getColumnSearchProps("fota_command"),
     },
 
     {
       title: "Fotadl",
       dataIndex: "fotadl",
       key: "fotadl",
-      ...getColumnSearchProps("fotadl"),
     },
 
     {
       title: "Full Char Current",
       dataIndex: "full_char_current",
       key: "full_char_current",
-      ...getColumnSearchProps("full_char_current"),
     },
 
     {
       title: "Full Char Voltage",
       dataIndex: "full_char_voltage",
       key: "full_char_voltage",
-      ...getColumnSearchProps("full_char_voltage"),
     },
 
     {
       title: "Key 1",
       dataIndex: "key1",
       key: "key1",
-      ...getColumnSearchProps("key1"),
     },
 
     {
       title: "Key 2",
       dataIndex: "key2",
       key: "key2",
-      ...getColumnSearchProps("key2"),
     },
 
     {
       title: "Key 3",
       dataIndex: "key3",
       key: "key3",
-      ...getColumnSearchProps("key3"),
     },
 
     {
       title: "Key 4",
       dataIndex: "key4",
       key: "key4",
-      ...getColumnSearchProps("key4"),
     },
 
     {
       title: "key 5",
       dataIndex: "key5",
       key: "key5",
-      ...getColumnSearchProps("key5"),
     },
 
     {
       title: "Led Blue",
       dataIndex: "ledblue",
       key: "ledblue",
-      ...getColumnSearchProps("ledblue"),
     },
     {
       title: "Led Green",
       dataIndex: "ledgreen",
       key: "ledgreen",
-      ...getColumnSearchProps("ledgreen"),
     },
     {
       title: "Led Red",
       dataIndex: "ledred",
       key: "ledred",
-      ...getColumnSearchProps("ledred"),
     },
     {
       title: "Low Batt Current",
       dataIndex: "low_batt_current",
       key: "low_batt_current",
-      ...getColumnSearchProps("low_batt_current"),
     },
     {
       title: "Low Batt Voltage",
       dataIndex: "low_batt_voltage",
       key: "low_batt_voltage",
-      ...getColumnSearchProps("low_batt_voltage"),
     },
     {
       title: "Mem Free",
       dataIndex: "memfree",
       key: "memfree",
-      ...getColumnSearchProps("memfree"),
     },
     {
       title: "Mem Id",
       dataIndex: "memid",
       key: "memid",
-      ...getColumnSearchProps("memid"),
     },
     {
       title: "Mem Total",
       dataIndex: "memtotal",
       key: "memtotal",
-      ...getColumnSearchProps("memtotal"),
     },
     {
       title: "Mem Used",
       dataIndex: "memused",
       key: "memused",
-      ...getColumnSearchProps("memused"),
     },
     {
       title: "PDP Status",
       dataIndex: "pdp_status",
       key: "pdp_status",
-      ...getColumnSearchProps("pdp_status"),
     },
     {
       title: "Prdappver",
       dataIndex: "prdappver",
       key: "prdappver",
-      ...getColumnSearchProps("prdappver"),
     },
     {
       title: "Read Time",
       dataIndex: "readtime",
       key: "readtime",
-      ...getColumnSearchProps("readtime"),
     },
     {
       title: "Resourcedl",
       dataIndex: "resourcedl",
       key: "resourcedl",
-      ...getColumnSearchProps("resourcedl"),
     },
     {
       title: "Sha App",
       dataIndex: "sha_app",
       key: "sha_app",
-      ...getColumnSearchProps("sha_app"),
     },
     {
       title: "Sha Dfota",
       dataIndex: "sha_dfota",
       key: "sha_dfota",
-      ...getColumnSearchProps("sha_dfota"),
     },
     {
       title: "Sha Res",
       dataIndex: "sha_res",
       key: "sha_res",
-      ...getColumnSearchProps("sha_res"),
     },
     {
       title: "Sim",
       dataIndex: "sim",
       key: "sim",
-      ...getColumnSearchProps("sim"),
     },
     {
       title: "Standby Current",
       dataIndex: "standby_current",
       key: "standby_current",
-      ...getColumnSearchProps("standby_current"),
     },
     {
       title: "Test Result",
       dataIndex: "test_result",
       key: "test_result",
-      ...getColumnSearchProps("test_result"),
     },
     {
       title: "Token",
       dataIndex: "token",
       key: "token",
-      ...getColumnSearchProps("token"),
     },
     {
       title: "Unzip App",
       dataIndex: "unzip_app",
       key: "unzip_app",
-      ...getColumnSearchProps("unzip_app"),
     },
     {
       title: "Unzip Dfota",
       dataIndex: "unzip_dfota",
       key: "unzip_dfota",
-      ...getColumnSearchProps("unzip_dfota"),
     },
     {
       title: "Unzip Res",
       dataIndex: "unzip_res",
       key: "unzip_res",
-      ...getColumnSearchProps("unzip_res"),
     },
     {
       title: "Ver App",
       dataIndex: "ver_app",
       key: "ver_app",
-      ...getColumnSearchProps("ver_app"),
     },
     {
       title: "Ver Dfota",
       dataIndex: "ver_dfota",
       key: "ver_dfota",
-      ...getColumnSearchProps("ver_dfota"),
     },
     {
       title: "Ver Res",
       dataIndex: "ver_res",
       key: "ver_res",
-      ...getColumnSearchProps("ver_res"),
     },
     {
       title: "Write Time",
       dataIndex: "writetime",
       key: "writetime",
-      ...getColumnSearchProps("writetime"),
     },
     {
       title: "Date & Time",
       dataIndex: "datetime",
       key: "datetime",
-      ...getColumnSearchProps("writetime"),
     },
   ];
 
@@ -889,7 +898,9 @@ const PostDataShow = () => {
             />
             <Button
               className="TopMenuButton2"
-              onClick={() => getData()}
+              onClick={() => {
+                getData();
+              }}
               style={{ width: "unset" }}
             >
               <SearchOutlined />
