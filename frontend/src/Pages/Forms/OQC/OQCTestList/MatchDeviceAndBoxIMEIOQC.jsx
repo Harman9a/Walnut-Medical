@@ -73,7 +73,11 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
         .then((result) => {
           let dataFound = result.data;
           if (dataFound.length !== 0) {
-            let mono_carton = dataFound[0].details[0].mono_carton;
+            let WholeData = dataFound[0].details[0];
+            let mono_carton = WholeData.mono_carton;
+            let standee = WholeData.standee;
+
+            console.log(WholeData)
 
             let newData = [];
 
@@ -87,6 +91,18 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
                 scan: x.imei,
               });
             });
+
+            standee.map((x, i) => {
+              newData.push({
+                id: x.id,
+                sno: `Standee Box ${x.id}`,
+                scanimei: `IMEI code will autofill`,
+                imei: x.imei,
+                status: { default: "ok", key: x.id },
+                scan: x.imei,
+              });
+            });
+            
             setDataList(newData);
           }
         });

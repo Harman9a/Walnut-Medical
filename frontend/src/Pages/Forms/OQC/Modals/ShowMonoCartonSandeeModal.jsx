@@ -8,6 +8,7 @@ const ShowMonoCartonSandeeModal = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [dataList, setDataList] = useState([]);
+  const [dataListStan, setDataListStan] = useState([]);
 
   useEffect(() => {
     setShowModal(showViewCartonModal);
@@ -15,11 +16,15 @@ const ShowMonoCartonSandeeModal = ({
 
   useEffect(() => {
     if (MonoCartonList.length != 0) {
+      console.log(MonoCartonList)
       setDataList(MonoCartonList[0].mono_carton);
+      setDataListStan(MonoCartonList[0].mono_carton);
+      setDataListStan(MonoCartonList[0].standee);
     }
   }, [MonoCartonList]);
 
   const cancelModuleFun = () => {
+
     setShowModal(false);
     handleViewCartonCancel();
   };
@@ -57,6 +62,23 @@ const ShowMonoCartonSandeeModal = ({
                     </React.Fragment>
                   );
                 })}
+                {dataListStan.map((x, i) => {
+                  return (
+                    <React.Fragment>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          margin: "5px 0",
+                        }}
+                      >
+                        <div>Standee{x.id}</div>
+                        <div>{x.imei}</div>
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+
               </div>
             </div>
           </Col>

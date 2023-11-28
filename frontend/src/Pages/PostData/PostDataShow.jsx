@@ -15,6 +15,7 @@ import React, { useEffect, useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import qs from "qs";
+import { saveAs } from "file-saver";
 
 import { DownloadOutlined } from "@ant-design/icons";
 
@@ -783,19 +784,37 @@ const PostDataShow = () => {
     downloadThis(newArr, name);
   };
 
-  const downloadDataWithoutDate = () => {
-    setLoading2(true);
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/downloadDataWithoutDate`)
-      .then((result) => {
-        let data = result.data;
-        console.log(data);
-        // makeArrofRawData(data, "Post_Report_full");
-        setLoading2(false);
-      })
-      .catch((err) => {
-        console.log(err);
+  const downloadDataWithoutDate = async  () => {
+    try {
+      // Make a GET request to the specified endpoint with 'arraybuffer' responseType
+      const response = await axios.get(`
+        ${process.env.REACT_APP_API_URL}/downloadDataWithoutDate`,
+        { responseType: "arraybuffer" }
+      );
+
+      // Create a Blob from the binary data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
+      // Use FileSaver to save the Blob as a file
+      saveAs(blob, "Post_Report_full.xlsx");
+    } catch (error) {
+      // Handle errors
+      console.error(error);
+    }
+    // setLoading2(true);
+    // axios
+    //   .get(`${process.env.REACT_APP_API_URL}/downloadDataWithoutDate`)
+    //   .then((result) => {
+    //     let data = result.data;
+    //     console.log(data);
+    //     // makeArrofRawData(data, "Post_Report_full");
+    //     setLoading2(false);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   const downloadDataWithDate = () => {

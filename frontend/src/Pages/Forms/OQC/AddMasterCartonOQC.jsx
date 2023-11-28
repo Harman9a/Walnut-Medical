@@ -68,9 +68,12 @@ const AddMasterCartonOQC = () => {
       content: "Scanned  Successfully",
     });
 
-    data = data.split(",");
+
+    data = data.split("\r\n");
 
     data = data.filter((x) => x != "");
+
+
 
     let master_carton_no = data.length - 2;
 
@@ -320,7 +323,7 @@ const AddMasterCartonOQC = () => {
                     //   type: "error",
                     //   content: "device not found",
                     // });
-                    console.log(error);
+                    // console.log(error);
                     // handleScanQRError();
                   }
                 }}

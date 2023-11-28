@@ -26,6 +26,7 @@ const SystemLogs = require("./Model/SystemLogs");
 const CheckLotModel = require("./Model/CheckLotMaterialModel");
 const materialIqcModel = require("./Model/MaterialModel");
 const SampleIdModel = require("./Model/SampleIdModel");
+const ExcelJS = require("exceljs");
 
 require("dotenv").config();
 
@@ -504,12 +505,51 @@ app.get("/getResponse/:id", async (req, res) => {
 
 app.get("/downloadDataWithoutDate", async (req, res) => {
   try {
-    const result = await PostApiData.find();
-    res.status(200).json(result);
+    const data = await PostApiData.find().lean().exec();
+
+    // Create a new Excel workbook and add a worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Machine Data");
+
+    // Add headers to the worksheet
+    const headers = Object.keys(data[0]); // Assuming the data has at least one item
+    worksheet.addRow(headers);
+
+    // Add data rows to the worksheet
+    data.forEach((item) => {
+      const row = [];
+      headers.forEach((header) => {
+        row.push(item[header]);
+      });
+      worksheet.addRow(row);
+    });
+
+    // Set response headers for Excel file download
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=data_without_date.xlsx"
+    );
+
+    // Send the Excel file as the response
+    await workbook.xlsx.write(res);
+
+    res.end();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
+  // try {
+  //   const result = await PostApiData.find();
+  //   res.status(200).json(result);
+  // } catch (error) {
+  //   res.status(500).json({ message: error.message });
+  // }
 });
+
 app.post("/downloadDataWithDate", async (req, res) => {
   try {
     const result = await PostApiData.find({
