@@ -416,6 +416,27 @@ app.get("/post-api-data", async (req, res) => {
   }
 });
 
+app.post("/GetSingleDayData", async (req, res) => {
+  try {
+    let selectedDate = req.body.startDate;
+
+    const startDate = new Date(selectedDate);
+    const endDate = new Date(selectedDate);
+    endDate.setHours(23, 59, 59, 999);
+
+    const result = await PostApiData.find({
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.post("/saveResponse", async (req, res) => {
   try {
     let status = await verifyToken(req.body.publicKey);

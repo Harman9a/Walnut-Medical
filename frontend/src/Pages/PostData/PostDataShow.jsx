@@ -105,15 +105,6 @@ const PostDataShow = () => {
           >
             Search
           </Button>
-          {/* <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Reset
-          </Button> */}
           <Button
             type="link"
             size="small"
@@ -784,10 +775,11 @@ const PostDataShow = () => {
     downloadThis(newArr, name);
   };
 
-  const downloadDataWithoutDate = async  () => {
+  const downloadDataWithoutDate = async () => {
     try {
       // Make a GET request to the specified endpoint with 'arraybuffer' responseType
-      const response = await axios.get(`
+      const response = await axios.get(
+        `
         ${process.env.REACT_APP_API_URL}/downloadDataWithoutDate`,
         { responseType: "arraybuffer" }
       );

@@ -609,6 +609,11 @@ li.ant-menu-submenu.ant-menu-submenu-inline {
   border: 1px solid #5b7690;
 }
 
+.myDataView {
+  display: flex;
+  justify-content: center;
+}
+
 /* Jitendra New Css Start */
 
 .card_style {

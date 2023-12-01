@@ -69,6 +69,7 @@ import EmployeeLoginDetailsPH from "./Pages/Forms/ProductionHead/EmployeeLoginDe
 import CheckListedSingleSoundBoxLQCPH from "./Pages/Forms/ProductionHead/CheckListedSingleSoundBoxLQCPH";
 import PostDataShowRead from "./Pages/PostData/PostDataShowRead";
 import PostDataApiLoadTest from "./Pages/PostData/PostDataApiLoadTest";
+import DataResultOneDay from "./Pages/DataResult/DataResultOneDay";
 const routerAdmin = createHashRouter(
   createRoutesFromElements(
     <Route>
@@ -192,6 +193,9 @@ const routerAdmin = createHashRouter(
         {/* PH} */}
         //Update By Jitendra Singh End Here
         {/* Form End */}
+        {/* Data Processing Start */}
+        <Route path="/DashboardByDate" element={<DataResultOneDay />} />
+        {/* Data Processing End */}
       </Route>
     </Route>
   )
