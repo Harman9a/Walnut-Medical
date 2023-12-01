@@ -70,6 +70,7 @@ import CheckListedSingleSoundBoxLQCPH from "./Pages/Forms/ProductionHead/CheckLi
 import PostDataShowRead from "./Pages/PostData/PostDataShowRead";
 import PostDataApiLoadTest from "./Pages/PostData/PostDataApiLoadTest";
 import DataResultOneDay from "./Pages/DataResult/DataResultOneDay";
+import DataResultDashboard from "./Pages/DataResult/DataResultDashboard";
 const routerAdmin = createHashRouter(
   createRoutesFromElements(
     <Route>
@@ -194,7 +195,7 @@ const routerAdmin = createHashRouter(
         //Update By Jitendra Singh End Here
         {/* Form End */}
         {/* Data Processing Start */}
-        <Route path="/DashboardByDate" element={<DataResultOneDay />} />
+        <Route path="/ResultDashboard" element={<DataResultDashboard />} />
         {/* Data Processing End */}
       </Route>
     </Route>

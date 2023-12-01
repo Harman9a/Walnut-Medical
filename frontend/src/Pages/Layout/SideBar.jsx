@@ -88,7 +88,7 @@ const SideBar = () => {
         key: "admin",
         name: "Dashboard",
         icon: <HomeFilled className="sidebarIcon" />,
-        link: "/DashboardByDate",
+        link: "/ResultDashboard",
         SubMenu: false,
       },
 

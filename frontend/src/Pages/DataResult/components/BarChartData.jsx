@@ -21,34 +21,17 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const BarChartData = ({ renderData }) => {
-  const [BarData, setBarData] = useState({
-    labels: [],
-    datasets: [],
-  });
-
+const BarChartData = ({ PassData, FailData }) => {
   const [passCount, setPassCount] = useState(0);
   const [failCount, setFailCount] = useState(0);
 
   useEffect(() => {
-    checkPassFailStatus(renderData);
-  }, [renderData]);
+    checkPassFailStatus();
+  }, [PassData]);
 
-  const checkPassFailStatus = (data) => {
-    let pass = 0;
-    let fail = 0;
-    data.map((x) => {
-      if (x.test_result == "pass") {
-        pass++;
-      }
-
-      if (x.test_result == "fail") {
-        fail++;
-      }
-    });
-
-    setPassCount(pass);
-    setFailCount(fail);
+  const checkPassFailStatus = () => {
+    setPassCount(PassData.length);
+    setFailCount(FailData.length);
   };
 
   const options = {

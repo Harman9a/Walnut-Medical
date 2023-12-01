@@ -4,30 +4,21 @@ import { Bar, Line } from "react-chartjs-2";
 
 import "chart.js/auto";
 
-const RetestBarChartData = ({ renderData, allData }) => {
+const RetestBarChartData = ({ PassData }) => {
   const [BarData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
-    checkPassFailStatus(renderData);
-  }, [renderData]);
+    checkPassFailStatus(PassData);
+  }, [PassData]);
 
-  const checkPassFailStatus = (data) => {
+  const checkPassFailStatus = (PassData) => {
     let DataLabelArr = [];
     let DataCountArr = [];
 
-    let uniqueImeis = new Set();
-    let uniqueArr = data.filter((obj) => {
-      if (!uniqueImeis.has(new Date(obj.createdAt).toLocaleString())) {
-        uniqueImeis.add(new Date(obj.createdAt).toLocaleString());
-        return true;
-      }
-      return false;
-    });
-
-    uniqueArr.map((x) => {
+    PassData.map((x) => {
       let inputText = x.ver_res;
       const dataArray = inputText.split(", ");
       const resultObject = {};
@@ -36,6 +27,10 @@ const RetestBarChartData = ({ renderData, allData }) => {
         const taskName = dataArray[i];
         const taskTime = parseFloat(dataArray[i + 1]);
         resultObject[taskName] = taskTime;
+      }
+
+      if (resultObject.Total_time === 5.27) {
+        console.log(x);
       }
 
       DataLabelArr.push(new Date(x.createdAt).toLocaleString());
@@ -70,6 +65,21 @@ const RetestBarChartData = ({ renderData, allData }) => {
       },
       datalabels: {
         display: false,
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          pinch: {
+            enabled: true, // Enable pinch zooming
+          },
+          wheel: {
+            enabled: true, // Enable wheel zooming
+          },
+          mode: "x",
+        },
       },
     },
   };

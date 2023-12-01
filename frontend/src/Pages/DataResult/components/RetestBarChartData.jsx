@@ -7,25 +7,32 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import zoomPlugin from "chartjs-plugin-zoom";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ChartDataLabels);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ChartDataLabels,
+  zoomPlugin
+);
 
-const RetestBarChartData = ({ renderData, allData }) => {
+const RetestBarChartData = ({ FailData, allData }) => {
   const [BarData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
-    checkPassFailStatus(renderData);
-  }, [renderData]);
+    checkPassFailStatus();
+  }, [FailData]);
 
-  const checkPassFailStatus = (data) => {
+  const checkPassFailStatus = () => {
     let DataLabelArr = [];
     let DataSetLabelArr = [];
     let DataCountArr = [];
 
-    data.map((x) => {
+    FailData.map((x) => {
       let retest_count = 0;
       allData.map((y) => {
         if (x.imei === y.imei) {
@@ -35,38 +42,11 @@ const RetestBarChartData = ({ renderData, allData }) => {
       });
     });
 
-    // console.log(allData, data);
-
-    // let uniqueImeis = new Set();
-    // let uniqueArr = data.filter((obj) => {
-    //   if (!uniqueImeis.has(obj.imei)) {
-    //     uniqueImeis.add(obj.imei);
-    //     return true;
-    //   }
-    //   console.log(obj.imei);
-    //   return false;
-    // });
-
-    // uniqueArr.map((x) => {
-    //   if (x.fail_reason !== "None") {
-    //     let failCount = 0;
-    //     data.map((y) => {
-    //       if (x.fail_reason === y.fail_reason) {
-    //         failCount++;
-    //       }
-    //     });
-    //     DataLabelArr.push(x.fail_reason);
-    //     DataCountArr.push(failCount);
-    //   }
-    // });
-
-    data.map((x) => {
+    FailData.map((x) => {
       DataLabelArr.push(x.ver_app);
       DataCountArr.push(x.retest_count);
       DataSetLabelArr.push(x.imei);
     });
-
-    console.log(DataLabelArr, DataCountArr);
 
     let DataSetRender = {
       fill: true,
@@ -106,6 +86,21 @@ const RetestBarChartData = ({ renderData, allData }) => {
           return value;
         },
         color: "white",
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          pinch: {
+            enabled: true, // Enable pinch zooming
+          },
+          wheel: {
+            enabled: true, // Enable wheel zooming
+          },
+          mode: "x",
+        },
       },
     },
   };

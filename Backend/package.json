@@ -24,6 +24,7 @@
     "multer-s3": "^2.10.0",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.4",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "socket.io": "^4.7.2"
   }
 }

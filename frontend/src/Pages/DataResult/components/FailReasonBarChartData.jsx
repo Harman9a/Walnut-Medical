@@ -10,40 +10,38 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ChartDataLabels);
 
-const FailReasonBarChartData = ({ renderData }) => {
+const FailReasonBarChartData = ({ FailData }) => {
   const [BarData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
-    checkPassFailStatus(renderData);
-  }, [renderData]);
+    checkPassFailStatus(FailData);
+  }, [FailData]);
 
   const checkPassFailStatus = (data) => {
     let DataLabelArr = [];
     let DataCountArr = [];
 
-    let uniqueImeis = new Set();
-    let uniqueArr = data.filter((obj) => {
-      if (!uniqueImeis.has(obj.fail_reason)) {
-        uniqueImeis.add(obj.fail_reason);
+    let uniqueFailResons = new Set();
+    let fail_reasons = data.filter((obj) => {
+      if (!uniqueFailResons.has(obj.fail_reason)) {
+        uniqueFailResons.add(obj.fail_reason);
         return true;
       }
       return false;
     });
 
-    uniqueArr.map((x) => {
-      if (x.fail_reason !== "None") {
-        let failCount = 0;
-        data.map((y) => {
-          if (x.fail_reason === y.fail_reason) {
-            failCount++;
-          }
-        });
-        DataLabelArr.push(x.fail_reason);
-        DataCountArr.push(failCount);
-      }
+    fail_reasons.map((x) => {
+      let failCount = 0;
+      data.map((y) => {
+        if (x.fail_reason === y.fail_reason) {
+          failCount++;
+        }
+      });
+      DataLabelArr.push(x.fail_reason);
+      DataCountArr.push(failCount);
     });
 
     let DataSetRender = {

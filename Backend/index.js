@@ -28,6 +28,9 @@ const materialIqcModel = require("./Model/MaterialModel");
 const SampleIdModel = require("./Model/SampleIdModel");
 const ExcelJS = require("exceljs");
 
+const { createServer } = require("node:http");
+const { Server } = require("socket.io");
+
 require("dotenv").config();
 
 var multer = require("multer");
@@ -56,6 +59,9 @@ const doc1Upload = (req, res) => {
 let app = express();
 let port = process.env.PORT;
 
+const server = createServer(app);
+const io = new Server(server);
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -78,7 +84,7 @@ mongoose
   .connect(process.env.MONGO_DB)
   .then(() => {
     console.log("Connected!");
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
     });
   })
@@ -419,6 +425,27 @@ app.get("/post-api-data", async (req, res) => {
 app.post("/GetSingleDayData", async (req, res) => {
   try {
     let selectedDate = req.body.startDate;
+
+    const startDate = new Date(selectedDate);
+    const endDate = new Date(selectedDate);
+    endDate.setHours(23, 59, 59, 999);
+
+    const result = await PostApiData.find({
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/GetCurentData", async (req, res) => {
+  try {
+    let selectedDate = new Date().toDateString();
 
     const startDate = new Date(selectedDate);
     const endDate = new Date(selectedDate);
@@ -1377,6 +1404,12 @@ app.post("/empLogin", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+io.on("connection", (socket) => {
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", msg);
+  });
 });
 
 // Settings
