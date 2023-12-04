@@ -56,21 +56,21 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
             setfullArr(newData);
 
             newData.map((x, i) => {
-              if (midNumber - 1 >= i) {
+              // if (midNumber - 1 >= i) {
                 objArr.push({
                   id: x.id,
                   name: x.name,
                   imei: x.imei,
                   status: x.status,
                 });
-              } else {
-                objArr2.push({
-                  id: x.id,
-                  name: x.name,
-                  imei: x.imei,
-                  status: x.status,
-                });
-              }
+              // } else {
+              //   objArr2.push({
+              //     id: x.id,
+              //     name: x.name,
+              //     imei: x.imei,
+              //     status: x.status,
+              //   });
+              // }
             });
 
             setDataList(objArr);
@@ -256,7 +256,7 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
       {contextHolder}
       <div>
         <Row style={{ width: "100%" }}>
-          <Col span={12} style={{ padding: "1rem" }}>
+          <Col span={24} style={{ padding: "1rem" }}>
             <Table
               columns={columns}
               dataSource={dataList}
@@ -266,7 +266,7 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
               }}
             />
           </Col>
-          <Col span={12} style={{ padding: "1rem" }}>
+          {/* <Col span={12} style={{ padding: "1rem" }}>
             <Table
               columns={columns}
               dataSource={dataList3}
@@ -275,7 +275,7 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
                 pageSize: 50,
               }}
             />
-          </Col>
+          </Col> */}
         </Row>
         <div
           style={{
