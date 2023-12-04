@@ -30,18 +30,10 @@ const DataResultCurrent = () => {
 
   return (
     <div>
-      <Spin spinning={loading}>
-        {allData.length === 0 ? (
-          <Result
-            icon={<img src="./SVG/noitem.svg" />}
-            subTitle="No Data Found Select Another Date"
-          />
-        ) : (
-          <div style={{ marginTop: "25px" }}>
-            {JSON.stringify(allData.length)}
-          </div>
-        )}
-      </Spin>
+      <Result
+        icon={<img src="./SVG/noitem.svg" />}
+        subTitle="No Data Found Select Another Date"
+      />
     </div>
   );
 };

@@ -42,7 +42,7 @@ const RetestBarChartData = ({ PassData }) => {
       datasets: [
         {
           fill: true,
-          label: "Dataset 1",
+          label: "Total Time",
           data: DataCountArr,
           borderColor: "rgb(53, 162, 235)",
           backgroundColor: "rgba(53, 162, 235, 0.5)",
@@ -61,7 +61,7 @@ const RetestBarChartData = ({ PassData }) => {
       },
       title: {
         display: true,
-        text: "Re-Test",
+        text: "Total Time",
       },
       datalabels: {
         display: false,
