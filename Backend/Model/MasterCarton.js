@@ -26,6 +26,26 @@ const MasterCartonSchema = mongoose.Schema(
       type: Array,
       required: false,
     },
+    ModalNumber: {
+      type: String,
+      required: false,
+    },
+    LineNumber: {
+      type: String,
+      required: false,
+    },
+    MasterCartonDate: {
+      type: String,
+      required: false,
+    },
+    BoxNumber: {
+      type: String,
+      required: false,
+    },
+    Language: {
+      type: String,
+      required: false,
+    },
     check_status: {
       type: String,
       required: false,

@@ -407,7 +407,7 @@ const ShowDefectedItemList = () => {
               onClick={handleExcelImport}
               style={{ marginRight: "15px" }}
             >
-              Export Report <DownloadOutlined />
+              Import Report <DownloadOutlined />
             </Button>
           </span>
         </Col>

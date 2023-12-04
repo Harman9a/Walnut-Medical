@@ -1,5 +1,6 @@
 import {
   DeleteOutlined,
+  DownloadOutlined,
   EyeOutlined,
   LogoutOutlined,
   UploadOutlined,
@@ -8,6 +9,7 @@ import { Button, Col, Image, Result, Row, Select, Table, Upload } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import * as XLSX from "xlsx";
 
 const ReviewStatusOQC = () => {
   const [masterCartonList, setMasterCartonList] = useState([]);
@@ -53,6 +55,8 @@ const ReviewStatusOQC = () => {
             pictures: x.pictures,
             defect_category: x.defect_category,
             remarks: x.remarks,
+            createdAt: x.createdAt,
+            updatedAt: x.updatedAt,
           });
         });
 
@@ -182,15 +186,59 @@ const ReviewStatusOQC = () => {
       key: "remarks",
     },
   ];
+  const handleExcelImport = () => {
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
 
+    const s2ab = (s) => {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
+    };
+    const formattedBatchList = masterCartonList.map((item) => {
+      const { createdAt, pictures, updatedAt, ...rest } = item;
+      return {
+        ...rest,
+        DateTime: new Date(item.createdAt).toLocaleString(),
+        UpdatedDateTime: new Date(item.updatedAt).toLocaleString(),
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(formattedBatchList);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate a download link for the workbook
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link and trigger a click to download the file
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Review_data_list_oqc.xlsx";
+    a.click();
+  };
   return (
     <div>
       <Row style={{ alignItems: "center" }}>
-        <Col span={11}>
+        <Col span={12}>
           <span className="TopMenuTxt">Review Status</span>
         </Col>
-        <Col span={6}></Col>
-        <Col span={7} style={{ textAlign: "right" }}>
+
+        <Col span={12} style={{ textAlign: "right" }}>
+          <span className="TopMenuTxt" style={{ marginRight: "15px" }}>
+            <Button
+              key="excelImport"
+              type="primary"
+              onClick={handleExcelImport}
+              style={{ marginRight: "15px" }}
+            >
+              Import Report <DownloadOutlined />
+            </Button>
+          </span>
           <span style={{ margin: "0 7px" }}>
             <Button
               type="text"

@@ -255,14 +255,27 @@ const MasterCartonOQC = () => {
                 span={24}
                 style={{ textAlign: "center", padding: "0rem 3rem 1rem" }}
               >
-                <img src="./SVG/check.svg" />
+                {/* <img src="./SVG/check.svg" /> */}
               </Col>
               <Col span={24} style={{ padding: "5px 3rem" }}>
+                <div>
+                  <div style={{ marginBottom: "15px" }}>Batch Number</div>
+                  <div>
+                    <Input
+                      className="masterCartonAddInput"
+                      placeholder="Standee 1 Number"
+                      onChange={(e) => setBatchName(e.target.value)}
+                      value={BatchName}
+                    />
+                  </div>
+                </div>
+              </Col>
+              {/* <Col span={24} style={{ padding: "5px 3rem" }}>
                 Batch Created successfully with Batch Number:
               </Col>
               <Col span={24} style={{ padding: "5px 3rem" }}>
                 {BatchName}
-              </Col>
+              </Col> */}
               <Col span={24} style={{ padding: "2rem  3rem 0" }}>
                 <div
                   style={{ display: "flex", justifyContent: "space-evenly" }}
