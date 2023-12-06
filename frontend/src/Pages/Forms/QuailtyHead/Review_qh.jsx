@@ -208,7 +208,7 @@ const Review_qh = () => {
       return buf;
     };
     const formattedBatchList = masterCartonList.map((item) => {
-      const { createdAt, pictures, defect_category, updatedAt, ...rest } = item;
+      const { createdAt, pictures, updatedAt, ...rest } = item;
       return {
         ...rest,
         DateTime: new Date(item.createdAt).toLocaleString(),
