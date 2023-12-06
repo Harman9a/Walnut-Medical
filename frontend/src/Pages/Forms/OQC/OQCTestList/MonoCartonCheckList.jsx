@@ -51,14 +51,14 @@ const MonoCartonCheckList = ({ dataList2, IMEICode }) => {
       dataIndex: "imei",
       key: "imei",
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: () => {
-        return "Uncheck";
-      },
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   key: "status",
+    //   render: () => {
+    //     return "Uncheck";
+    //   },
+    // },
     {
       title: "Defects",
       dataIndex: "defects",
@@ -101,6 +101,9 @@ const MonoCartonCheckList = ({ dataList2, IMEICode }) => {
                 position: ["none", "none"],
                 pageSize: 50,
               }}
+              rowClassName={(record) =>
+                record.defects >= 1 ? "not-ok-row" : ""
+              }
             />
           </Col>
         </Row>

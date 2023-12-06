@@ -10,7 +10,11 @@ import {
   message,
   Input,
 } from "antd";
-import { LogoutOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DownloadOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ActiveBatch,
@@ -19,7 +23,7 @@ import {
 } from "../../../Redux/Actions";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import * as XLSX from "xlsx";
 const MasterCartonBatchList_qc = () => {
   const [LineModel, setLineModel] = useState(false);
   const [BatchModel, setBatchModel] = useState(false);
@@ -63,6 +67,8 @@ const MasterCartonBatchList_qc = () => {
 
   useEffect(() => {
     checkLineActive();
+    GetBatchAllData();
+    getBatch();
   }, []);
 
   const checkLineActive = () => {
@@ -185,13 +191,49 @@ const MasterCartonBatchList_qc = () => {
       });
   };
 
-  const getBatch = (line) => {
+  const [BatchListData, setGetBatchlist] = useState("");
+
+  const GetBatchAllData = () => {
     axios
-      .post(process.env.REACT_APP_API_URL + "/getBatch", {
-        line,
+      .post(process.env.REACT_APP_API_URL + "/getBatchforExcel", {})
+      .then((result) => {
+        let newArr = [];
+        result.data.map((x) => {
+          newArr.push({
+            batch: x.batch_name,
+            line: x.line_name,
+            Username: x.username,
+            Number_of_Master_Carton_Added: x.total_no,
+            createdAt: x.createdAt,
+            updatedAt: x.updatedAt,
+          });
+        });
+
+        setGetBatchlist(newArr);
       })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getBatch = () => {
+    axios
+      .post(process.env.REACT_APP_API_URL + "/getBatchQH", {})
       .then((result) => {
         setBatchList(result.data);
+        let newArr = [];
+        result.data.map((x) => {
+          newArr.push({
+            batch: x.batch_name,
+            line: x.line_name,
+            user_id: x.user_id,
+            Number_of_Master_Carton_Added: x.total_no,
+            createdAt: x.createdAt,
+            updatedAt: x.updatedAt,
+          });
+        });
+
+        setGetBatchlist(newArr);
       })
       .catch((err) => {
         console.log(err);
@@ -218,6 +260,41 @@ const MasterCartonBatchList_qc = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+  const handleExcelImport = () => {
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+
+    const s2ab = (s) => {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
+    };
+    const formattedBatchList = BatchListData.map((item) => {
+      const { createdAt, updatedAt, ...rest } = item;
+      return {
+        ...rest,
+        DateTime: new Date(item.createdAt).toLocaleString(),
+        UpdatedDateTime: new Date(item.updatedAt).toLocaleString(),
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(formattedBatchList);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate a download link for the workbook
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link and trigger a click to download the file
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Checked_data_list.xlsx";
+    a.click();
   };
 
   return (
@@ -345,8 +422,20 @@ const MasterCartonBatchList_qc = () => {
         </Spin>
       </Modal>
       <Row style={{ alignItems: "center" }}>
-        <Col span={11}>
+        <Col span={12}>
           <span className="TopMenuTxt">Master Carton Batches checked list</span>
+        </Col>
+        <Col span={12} style={{ textAlign: "right" }}>
+          <span className="TopMenuTxt" style={{ marginRight: "15px" }}>
+            <Button
+              key="excelImport"
+              type="primary"
+              onClick={handleExcelImport}
+              style={{ marginRight: "15px" }}
+            >
+              Import Report <DownloadOutlined />
+            </Button>
+          </span>
         </Col>
       </Row>
       <Row style={{ marginTop: "2rem" }}>

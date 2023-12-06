@@ -45,6 +45,16 @@ const Review_qh = () => {
       .then((result) => {
         let newArr = [];
         result.data.map((x) => {
+          let Defect_status = "";
+          if (x.defect_category === "2") {
+            Defect_status = "Functional";
+          } else if (x.defect_category === "3") {
+            Defect_status = "Aesthetic";
+          } else if (x.defect_category === "4") {
+            Defect_status = "Missing category"; // Corrected the typo here
+          } else {
+            Defect_status = "Other";
+          }
           newArr.push({
             batch: x.batch,
             line: x.line,
@@ -54,6 +64,7 @@ const Review_qh = () => {
             oqcl: x.oqcl,
             pictures: x.pictures,
             defect_category: x.defect_category,
+            Defect_Category_status: Defect_status,
             remarks: x.remarks,
             createdAt: x.createdAt,
             updatedAt: x.updatedAt,
@@ -197,7 +208,7 @@ const Review_qh = () => {
       return buf;
     };
     const formattedBatchList = masterCartonList.map((item) => {
-      const { createdAt, pictures, updatedAt, ...rest } = item;
+      const { createdAt, pictures, defect_category, updatedAt, ...rest } = item;
       return {
         ...rest,
         DateTime: new Date(item.createdAt).toLocaleString(),

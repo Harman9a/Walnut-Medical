@@ -29,12 +29,10 @@ const ReviewStatusOQC = () => {
     },
     onChange(info) {
       if (info.file.status !== "uploading") {
-        // console.log(info.file, info.fileList);
       }
       if (info.file.status === "done") {
         updateFileImage(info.file.response, Activekey);
       } else if (info.file.status === "error") {
-        // message.error(`${info.file.name} file upload failed.`);
       }
     },
   };
@@ -43,13 +41,24 @@ const ReviewStatusOQC = () => {
     axios
       .get(process.env.REACT_APP_API_URL + "/getItemsForReview")
       .then((result) => {
-        let newArr = [];
-        result.data.map((x) => {
-          newArr.push({
+        const newArr = result.data.map((x) => {
+          let Defect_status = "";
+          if (x.defect_category === "2") {
+            Defect_status = "Functional";
+          } else if (x.defect_category === "3") {
+            Defect_status = "Aesthetic";
+          } else if (x.defect_category === "4") {
+            Defect_status = "Missing category";
+          } else {
+            Defect_status = "Other";
+          }
+
+          return {
             batch: x.batch,
             line: x.line,
             master_carton: x.master_carton,
             defect_list_name: x.defect_list_name,
+            Defect_Category_status: Defect_status,
             imei: x.imei,
             oqcl: x.oqcl,
             pictures: x.pictures,
@@ -57,7 +66,7 @@ const ReviewStatusOQC = () => {
             remarks: x.remarks,
             createdAt: x.createdAt,
             updatedAt: x.updatedAt,
-          });
+          };
         });
 
         setMasterCartonList(newArr);
@@ -71,7 +80,6 @@ const ReviewStatusOQC = () => {
     axios
       .post(process.env.REACT_APP_API_URL + "/deleteMasterCarton", { id })
       .then((result) => {
-        // console.log(result.data);
         getMasterCartons();
       })
       .catch((err) => {
@@ -197,7 +205,8 @@ const ReviewStatusOQC = () => {
       return buf;
     };
     const formattedBatchList = masterCartonList.map((item) => {
-      const { createdAt, pictures, updatedAt, ...rest } = item;
+      const { createdAt, pictures, defect_category, updatedAt, ...rest } = item;
+
       return {
         ...rest,
         DateTime: new Date(item.createdAt).toLocaleString(),
@@ -236,7 +245,7 @@ const ReviewStatusOQC = () => {
               onClick={handleExcelImport}
               style={{ marginRight: "15px" }}
             >
-              Import Report <DownloadOutlined />
+              Export Report <DownloadOutlined />
             </Button>
           </span>
           <span style={{ margin: "0 7px" }}>

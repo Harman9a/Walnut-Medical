@@ -3,7 +3,18 @@ import {
   LogoutOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Input, Modal, Result, Row, Table, message } from "antd";
+import {
+  Button,
+  Col,
+  Input,
+  Modal,
+  Result,
+  Row,
+  Table,
+  message,
+  Select,
+  DatePicker,
+} from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -14,13 +25,13 @@ import { QrReader } from "react-qr-reader";
 const AddMasterCartonOQC = () => {
   const [Standee1Number, setStandee1Number] = useState();
   const [Standee2Number, setStandee2Number] = useState();
-  
+  const { Option } = Select;
   const [ModalNumber, setModalNumber] = useState();
   const [LineNumber, setLineNumber] = useState();
   const [MasterCartonDate, setMasterCartonDate] = useState();
+  console.log(MasterCartonDate);
   const [BoxNumber, setBoxNumber] = useState();
   const [Language, setLanguage] = useState();
-
 
   const [masterCartonList, setMasterCartonList] = useState([]);
   const [MonoCartonList, setMonoCartonList] = useState([]);
@@ -61,9 +72,9 @@ const AddMasterCartonOQC = () => {
             vic: x.details,
             tmc: x._id,
             action: x._id,
-            modal_number:x.ModalNumber,
-            box_number:x.BoxNumber,
-            language:x.Language,
+            modal_number: x.ModalNumber,
+            box_number: x.BoxNumber,
+            language: x.Language,
           });
         });
 
@@ -81,12 +92,9 @@ const AddMasterCartonOQC = () => {
       content: "Scanned  Successfully",
     });
 
-
     data = data.split("\r\n");
 
     data = data.filter((x) => x != "");
-
-
 
     let master_carton_no = data.length;
 
@@ -121,11 +129,10 @@ const AddMasterCartonOQC = () => {
       // }
     });
 
-    console.log(dataObj)
+    console.log(dataObj);
 
     gotDataFromQR(dataObj, dataObjDetails);
   };
-
 
   const gotDataFromQR = (data, details) => {
     setDataFound(data);
@@ -147,11 +154,10 @@ const AddMasterCartonOQC = () => {
   };
 
   const handleMasterCatronAdd = () => {
-
     let standee = [
       { id: 1, imei: Standee1Number, defect: 0 },
-      { id: 2, imei: Standee2Number, defect: 0 }
-    ]
+      { id: 2, imei: Standee2Number, defect: 0 },
+    ];
 
     let masterCartonObj = {
       batch_name: selector.LineLogin.active_batch,
@@ -167,10 +173,10 @@ const AddMasterCartonOQC = () => {
       BoxNumber,
       Language,
     };
-    
+
     masterCartonObj.details[0].standee = standee;
 
-    console.log(masterCartonObj)
+    console.log(masterCartonObj);
 
     axios
       .post(process.env.REACT_APP_API_URL + "/AddMasterCarton", masterCartonObj)
@@ -240,11 +246,11 @@ const AddMasterCartonOQC = () => {
       dataIndex: "language",
       key: "language",
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   key: "status",
+    // },
     {
       title: "Items IMEI code Found",
       dataIndex: "iicf",
@@ -258,7 +264,7 @@ const AddMasterCartonOQC = () => {
         <Button
           className="lineModalButtonSUbmit"
           onClick={() => handleViewCarton(record)}
-          style={{width:"90px" , padding:'15px' ,fontSize:"12px"}}
+          style={{ width: "90px", padding: "15px", fontSize: "12px" }}
         >
           View
         </Button>
@@ -273,7 +279,7 @@ const AddMasterCartonOQC = () => {
           <Button
             className="lineModalButtonSUbmit"
             onClick={() => StartTesting(record)}
-            style={{width:"90px" , padding:'15px' ,fontSize:"12px"}}
+            style={{ width: "90px", padding: "15px", fontSize: "12px" }}
           >
             Start Testing
           </Button>
@@ -425,11 +431,10 @@ const AddMasterCartonOQC = () => {
               {foundDataDetails === true ? (
                 <div style={{ color: "#606060", fontSize: "12px" }}>
                   <div style={{ marginTop: "5px" }}>
-                    {dataFound.mono_carton} Mono Carton  IMEI code successfully on scanning!
+                    {dataFound.mono_carton} Mono Carton IMEI code successfully
+                    on scanning!
                   </div>
-                  <div style={{ marginTop: "2px" }}>
-
-                  </div>
+                  <div style={{ marginTop: "2px" }}></div>
                 </div>
               ) : (
                 ""
@@ -438,7 +443,7 @@ const AddMasterCartonOQC = () => {
           </div>
         </Col>
         <Col span={12}>
-          <div >
+          <div>
             <div style={{ marginBottom: "15px" }}>Master Carton Number</div>
             <div>
               <Input
@@ -517,12 +522,21 @@ const AddMasterCartonOQC = () => {
               <div style={{ marginTop: "30px" }}>
                 <div style={{ marginBottom: "15px" }}>Date</div>
                 <div>
-                  <Input
+                  {/* <Input
                     style={{ width: "200px" }}
                     className="masterCartonAddInput"
                     placeholder="Date"
                     onChange={(e) => setMasterCartonDate(e.target.value)}
                     value={MasterCartonDate}
+                  /> */}
+                  <DatePicker
+                    className="masterCartonAddInput"
+                    style={{ width: "200px" }}
+                    format="DD-MM-YY"
+                    onChange={(date, dateString) => {
+                      const formattedDate = dateString;
+                      setMasterCartonDate(formattedDate);
+                    }}
                   />
                 </div>
               </div>
@@ -543,22 +557,22 @@ const AddMasterCartonOQC = () => {
             </Col>
             <Col span={12}>
               <div style={{ marginTop: "30px" }}>
-                <div style={{ marginBottom: "15px" }}>Language</div>
-                <div>
-                  <Input
-                    style={{ width: "200px" }}
-                    className="masterCartonAddInput"
-                    placeholder="Language"
-                    onChange={(e) => setLanguage(e.target.value)}
-                    value={Language}
-                  />
-                </div>
+                {/* <div style={{ marginBottom: "15px" }}>Language</div> */}
+                <Select
+                  style={{ width: "200px" }}
+                  // className="masterCartonAddInput"
+                  placeholder="Select Language"
+                  onChange={(value) => setLanguage(value)}
+                  value={Language}
+                >
+                  <Option value="English">English</Option>
+                  <Option value="Hindi">Hindi</Option>
+                </Select>
               </div>
             </Col>
           </Row>
         </Col>
-        <Col
-          span={24}>
+        <Col span={24}>
           {/* <div style={{ marginTop: "40px" }}>
             <Button
               className="lineModalButtonSUbmit"

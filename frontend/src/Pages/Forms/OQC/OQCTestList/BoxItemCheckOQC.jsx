@@ -57,12 +57,12 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
 
             newData.map((x, i) => {
               // if (midNumber - 1 >= i) {
-                objArr.push({
-                  id: x.id,
-                  name: x.name,
-                  imei: x.imei,
-                  status: x.status,
-                });
+              objArr.push({
+                id: x.id,
+                name: x.name,
+                imei: x.imei,
+                status: x.status,
+              });
               // } else {
               //   objArr2.push({
               //     id: x.id,

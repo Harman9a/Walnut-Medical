@@ -778,6 +778,7 @@ const PostDataShow = () => {
   const downloadDataWithoutDate = async () => {
     try {
       // Make a GET request to the specified endpoint with 'arraybuffer' responseType
+      setLoading2(true);
       const response = await axios.get(
         `
         ${process.env.REACT_APP_API_URL}/downloadDataWithoutDate`,
@@ -791,6 +792,7 @@ const PostDataShow = () => {
 
       // Use FileSaver to save the Blob as a file
       saveAs(blob, "Post_Report_full.xlsx");
+      setLoading2(false);
     } catch (error) {
       // Handle errors
       console.error(error);

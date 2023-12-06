@@ -1005,7 +1005,53 @@ app.post("/getBatch", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+app.post("/getBatchQH", async (req, res) => {
+  try {
+    const currentDate = moment().startOf("day");
+    const result = await BatchData.find({
+      createdAt: {
+        $gte: currentDate.toDate(),
+        $lt: moment(currentDate).endOf("day").toDate(),
+      },
+      type: "OQC",
+    });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
+app.post("/getBatchforExcel", async (req, res) => {
+  try {
+    const currentDate = moment().startOf("day");
+    const result = await BatchData.find({
+      createdAt: {
+        $gte: currentDate.toDate(),
+        $lt: moment(currentDate).endOf("day").toDate(),
+      },
+      type: "OQC",
+    });
+
+    const uniqueUserIds = new Set(result.map((record) => record.user_id));
+    const userNames = await Users.find({
+      _id: { $in: Array.from(uniqueUserIds) },
+    }).lean(); // Use lean() to convert documents to plain objects
+
+    const userNameMap = {};
+    userNames.forEach((user) => {
+      userNameMap[user._id] = `${user.f_name} ${user.l_name}`;
+    });
+
+    const resultWithUsernames = result.map((record) => ({
+      ...record.toObject(), // Convert Mongoose document to plain object
+      username: userNameMap[record.user_id],
+    }));
+
+    res.status(200).json(resultWithUsernames);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 app.post("/deletBatch", async (req, res) => {
   try {
     const { id } = req.body;
