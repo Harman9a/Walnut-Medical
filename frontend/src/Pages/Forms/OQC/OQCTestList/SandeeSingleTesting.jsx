@@ -209,6 +209,7 @@ const SandeeSingleTesting = ({ dataList2 }) => {
       render: (remarks) => {
         return (
           <Input.TextArea
+            defaultValue={remarks.default}
             onChange={(value) => updateText(value.target.value, remarks.key)}
           />
         );
@@ -250,6 +251,9 @@ const SandeeSingleTesting = ({ dataList2 }) => {
               dataSource={dataList}
               pagination={{
                 position: ["none", "none"],
+              }}
+              rowClassName={(record) => {
+                return record.status.default === "notok" ? "not-ok-row" : "";
               }}
             />
             <div

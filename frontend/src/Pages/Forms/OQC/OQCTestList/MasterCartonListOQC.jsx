@@ -74,6 +74,7 @@ const MasterCartonListOQC = ({ IMEICode, dataList2 }) => {
         },
       ]);
     }
+    console.log(dataList);
   };
   const updateStatus = (value, key) => {
     let arr = dataList;
@@ -189,8 +190,10 @@ const MasterCartonListOQC = ({ IMEICode, dataList2 }) => {
       dataIndex: "remarks",
       key: "remarks",
       render: (remarks) => {
+        // console.log(remarks.default);
         return (
           <Input.TextArea
+            defaultValue={remarks.default}
             onChange={(value) => updateText(value.target.value, remarks.key)}
           />
         );
@@ -244,9 +247,9 @@ const MasterCartonListOQC = ({ IMEICode, dataList2 }) => {
   };
 
   return (
-    <div>
+    <div style={{ background: "#fff" }}>
       {contextHolder}
-      <div>
+      <div style={{ background: "#fff" }}>
         <Table
           columns={columns}
           dataSource={dataList}
@@ -261,7 +264,7 @@ const MasterCartonListOQC = ({ IMEICode, dataList2 }) => {
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            marginTop: "1rem",
+            padding: "1rem",
           }}
         >
           <div style={{ margin: "0 15px" }}>

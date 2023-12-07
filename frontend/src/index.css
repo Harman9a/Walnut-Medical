@@ -1946,10 +1946,21 @@ li.ant-menu-submenu.ant-menu-submenu-inline {
   color: white;
 }
 
-.not-ok-row:hover {
+/* .not-ok-row:hover {
   background-color: #ffe7e7 !important;
   color: white !important;
+} */
+
+.not-ok-row2 {
+  background-color: #ffe7e7;
+  color: white;
 }
+
+/* .not-ok-row2:hover {
+  background-color: #ffe7e7 !important;
+  color: white !important;
+} */
+
 .filter-modal {
   width: 25% !important;
   height: 220px !important;

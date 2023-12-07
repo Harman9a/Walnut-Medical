@@ -264,6 +264,9 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
                 position: ["none", "none"],
                 pageSize: 50,
               }}
+              rowClassName={(record) => {
+                return record.status.default === "notok" ? "not-ok-row" : "";
+              }}
             />
           </Col>
           {/* <Col span={12} style={{ padding: "1rem" }}>
@@ -290,7 +293,7 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
           <div>
             <Button
               className="lineModalButtonSUbmit"
-              onClick={() => console.log(dataList)}
+              onClick={() => handleSubmit()}
             >
               Save
             </Button>

@@ -77,7 +77,7 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
             let mono_carton = WholeData.mono_carton;
             let standee = WholeData.standee;
 
-            console.log(WholeData)
+            console.log(WholeData);
 
             let newData = [];
 
@@ -102,7 +102,7 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
                 scan: x.imei,
               });
             });
-            
+
             setDataList(newData);
           }
         });
@@ -376,6 +376,9 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
               pagination={{
                 position: ["none", "none"],
                 pageSize: 50,
+              }}
+              rowClassName={(record) => {
+                return record.status.default === "notok" ? "not-ok-row" : "";
               }}
             />
             <div

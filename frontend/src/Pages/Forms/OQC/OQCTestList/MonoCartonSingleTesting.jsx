@@ -254,6 +254,7 @@ const MonoCartonSingleTesting = () => {
       render: (remarks) => {
         return (
           <Input.TextArea
+            defaultValue={remarks.default}
             onChange={(value) => updateText(value.target.value, remarks.key)}
           />
         );
