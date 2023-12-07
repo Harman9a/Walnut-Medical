@@ -207,7 +207,39 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
   ];
 
   const handleSubmit = () => {
-    console.log(dataList);
+    dataList.map((x) => {
+      if (x.status.default === "notok") {
+
+        console.log(x)
+
+
+
+
+
+
+        let reviewArr = {
+          batch: selector.LineLogin.active_batch,
+          line: selector.LineLogin.line_name,
+          master_carton: IMEICode,
+          defect_list_name: "Match device and box IMEI no on barcode sticker",
+          imei: x.imei,
+          oqcl: x.sno,
+
+        };
+
+        axios
+          .post(process.env.REACT_APP_API_URL + "/addForReview", reviewArr)
+          .then((result) => {
+            // console.log(result.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+
+
+      }
+    })
 
     let dataObj = {
       mc_imei_code: IMEICode,
@@ -308,7 +340,7 @@ const MatchDeviceAndBoxIMEIOQC = ({ dataList2 }) => {
                           }
 
                           if (!!error) {
-                            console.log(error);
+                            // console.log(error);
                           }
                         }}
                       />

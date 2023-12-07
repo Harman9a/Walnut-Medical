@@ -216,7 +216,7 @@ const BoxItemCheckOQC = ({ dataList2, IMEICode }) => {
           line: selector.LineLogin.line_name,
           master_carton: IMEICode,
           defect_list_name: "Box Items check",
-          imei: "-",
+          imei: x.imei,
           oqcl: x.name,
         };
 

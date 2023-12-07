@@ -21,6 +21,7 @@ const MonoCartonSingleTesting = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
+
     setIMEICode(parms.imei);
     getData();
   }, []);
@@ -152,6 +153,7 @@ const MonoCartonSingleTesting = () => {
     });
     setDataList(arr);
   };
+
   const updateDefect = (value, key) => {
     let arr = dataList;
     arr.map((x) => {
@@ -273,7 +275,7 @@ const MonoCartonSingleTesting = () => {
           line: selector.LineLogin.line_name,
           master_carton: IMEICode,
           defect_list_name: "Sound Box Outgoing Quality Check list",
-          imei: "-",
+          imei: parms.id,
           oqcl: x.name,
           pictures: x.pictures.default,
           defect_category: x.defect_category.default,

@@ -218,7 +218,37 @@ const SandeeSingleTesting = ({ dataList2 }) => {
   ];
 
   const handleSubmit = () => {
-    console.log(dataList);
+
+    dataList.map((x) => {
+      if (x.status.default === "notok") {
+
+
+        let reviewArr = {
+          batch: selector.LineLogin.active_batch,
+          line: selector.LineLogin.line_name,
+          master_carton: IMEICode,
+          defect_list_name: "Standee Box check List",
+          imei: x.imei,
+          oqcl: x.name,
+          pictures: x.pictures.default,
+          defect_category: x.defect_category.default,
+          remarks: x.remarks.default,
+        };
+
+        axios
+          .post(process.env.REACT_APP_API_URL + "/addForReview", reviewArr)
+          .then((result) => {
+            // console.log(result.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+  
+
+      }
+    })
+
 
     let dataObj = {
       mc_imei_code: IMEICode,
