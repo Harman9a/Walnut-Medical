@@ -8,6 +8,7 @@ import PieChartData from "./components/PieChartData";
 import FailReasonBarChartData from "./components/FailReasonBarChartData";
 import RetestBarChartData from "./components/RetestBarChartData";
 import TimeOutAreaChartData from "./components/TimeOutAreaChartData";
+import FrequencyBarChart from "./components/FrequencyBarChart";
 
 const DataResultOneDay = () => {
   const [PassData, setPassData] = useState([]);
@@ -101,19 +102,32 @@ const DataResultOneDay = () => {
             <div style={{ marginTop: "25px" }}>
               <Row style={{ width: "100%" }}>
                 <Col span={12}>
-                  <Card bordered={false} className="CardStyleDataRender">
+                  <Card
+                    bordered={false}
+                    style={{ margin: "1rem" }}
+                    className="CardStyleDataRender"
+                  >
                     <BarChartData PassData={PassData} FailData={FailData} />
                   </Card>
                 </Col>
                 <Col span={12}>
-                  <Card bordered={false} className="CardStyleDataRender">
+                  <Card
+                    bordered={false}
+                    style={{ margin: "1rem" }}
+                    className="CardStyleDataRender"
+                  >
                     <PieChartData PassData={PassData} FailData={FailData} />
                   </Card>
                 </Col>
 
                 <Col span={24}>
-                  <Card bordered={false} style={{ margin: "1rem" }}>
+                  <Card bordered={false} style={{ margin: "2rem 1rem" }}>
                     <FailReasonBarChartData FailData={FailData} />
+                  </Card>
+                </Col>
+                <Col span={24}>
+                  <Card bordered={false} style={{ margin: "2rem 1rem" }}>
+                    <FrequencyBarChart PassData={PassData} />
                   </Card>
                 </Col>
                 <Col span={24}>

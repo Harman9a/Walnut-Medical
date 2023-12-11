@@ -10,6 +10,8 @@ const RetestBarChartData = ({ PassData }) => {
     datasets: [],
   });
 
+  const [averageTime, setAverageTime] = useState(0);
+
   useEffect(() => {
     checkPassFailStatus(PassData);
   }, [PassData]);
@@ -44,11 +46,17 @@ const RetestBarChartData = ({ PassData }) => {
           fill: true,
           label: "Total Time",
           data: DataCountArr,
-          borderColor: "rgb(53, 162, 235)",
-          backgroundColor: "rgba(53, 162, 235, 0.5)",
+          borderColor: "#182e42a4",
+          backgroundColor: "#2b3e50da",
         },
       ],
     };
+
+    const sum = DataCountArr.reduce((acc, number) => acc + number, 0);
+
+    const average = sum / DataCountArr.length;
+
+    setAverageTime(average.toFixed(2));
 
     setBarData(DataSetRender);
   };
@@ -60,7 +68,7 @@ const RetestBarChartData = ({ PassData }) => {
         display: false,
       },
       title: {
-        display: true,
+        display: false,
         text: "Total Time",
       },
       datalabels: {
@@ -87,6 +95,10 @@ const RetestBarChartData = ({ PassData }) => {
   return (
     <div>
       <div>
+        <div style={{ padding: "1rem", textAlign: "center" }}>
+          <div style={{ fontSize: "18px", fontWeight: "500" }}>Total Time</div>
+          <div>Average Time :- {averageTime}</div>
+        </div>
         <Line options={options} data={BarData} />
       </div>
     </div>

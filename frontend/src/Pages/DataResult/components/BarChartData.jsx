@@ -41,7 +41,7 @@ const BarChartData = ({ PassData, FailData }) => {
         position: "top",
       },
       title: {
-        display: true,
+        display: false,
         text: "Test Result",
       },
       datalabels: {
@@ -72,6 +72,9 @@ const BarChartData = ({ PassData, FailData }) => {
   return (
     <div>
       <div>
+        <div style={{ padding: "1rem", textAlign: "center" }}>
+          <div style={{ fontSize: "18px", fontWeight: "500" }}>Test Result</div>
+        </div>
         <Bar options={options} data={data} />
       </div>
     </div>

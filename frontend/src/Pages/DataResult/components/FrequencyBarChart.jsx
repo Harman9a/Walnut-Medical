@@ -17,44 +17,47 @@ ChartJS.register(
   zoomPlugin
 );
 
-const RetestBarChartData = ({ FailData, allData }) => {
+const FrequencyBarChart = ({ PassData }) => {
   const [BarData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
-    checkPassFailStatus();
-  }, [FailData]);
+    checkPassFailStatus(PassData);
+  }, [PassData]);
 
-  const checkPassFailStatus = () => {
+  const checkPassFailStatus = (data) => {
     let DataLabelArr = [];
-    let DataSetLabelArr = [];
     let DataCountArr = [];
 
-    FailData.map((x) => {
-      let retest_count = 0;
-      allData.map((y) => {
-        if (x.imei === y.imei) {
-          retest_count++;
-          x.retest_count = retest_count;
-        }
-      });
+    let uniqueFailResons = new Set();
+    let allmodeuls = data.filter((obj) => {
+      if (!uniqueFailResons.has(obj.ver_app)) {
+        uniqueFailResons.add(obj.ver_app);
+        return true;
+      }
+      return false;
     });
 
-    FailData.map((x) => {
+    console.log(allmodeuls);
+
+    allmodeuls.map((x) => {
+      let moduleRepeatCount = 0;
+      data.map((y) => {
+        if (x.ver_app === y.ver_app) {
+          moduleRepeatCount++;
+        }
+      });
       DataLabelArr.push(x.ver_app);
-      DataCountArr.push(x.retest_count);
-      DataSetLabelArr.push(x.imei);
+      DataCountArr.push(moduleRepeatCount);
     });
 
     let DataSetRender = {
-      fill: true,
       labels: DataLabelArr,
       datasets: [
         {
           label: "Dataset 1",
-          imei: DataSetLabelArr,
           data: DataCountArr,
           backgroundColor: "#2b3e50",
         },
@@ -66,20 +69,18 @@ const RetestBarChartData = ({ FailData, allData }) => {
 
   const options = {
     responsive: true,
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (d) => {
-            return `IMEI :- ${d.dataset.imei[d.dataIndex]}`;
-          },
-        },
+    scales: {
+      y: {
+        beginAtZero: true,
       },
+    },
+    plugins: {
       legend: {
         display: false,
       },
       title: {
         display: false,
-        text: "Re-Test",
+        text: "Fail Resson",
       },
       datalabels: {
         formatter: (value) => {
@@ -108,7 +109,7 @@ const RetestBarChartData = ({ FailData, allData }) => {
   return (
     <div>
       <div style={{ padding: "1rem", textAlign: "center" }}>
-        <div style={{ fontSize: "18px", fontWeight: "500" }}>Re-Test</div>
+        <div style={{ fontSize: "18px", fontWeight: "500" }}>Frequency</div>
       </div>
       <div>
         <Bar options={options} data={BarData} />
@@ -117,4 +118,4 @@ const RetestBarChartData = ({ FailData, allData }) => {
   );
 };
 
-export default RetestBarChartData;
+export default FrequencyBarChart;

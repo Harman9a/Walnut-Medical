@@ -616,7 +616,7 @@ li.ant-menu-submenu.ant-menu-submenu-inline {
 
 .CardStyleDataRender {
   margin: 1rem;
-  height: 300px;
+  height: 100%;
   display: flex;
   /* width: 100%; */
   justify-content: center;

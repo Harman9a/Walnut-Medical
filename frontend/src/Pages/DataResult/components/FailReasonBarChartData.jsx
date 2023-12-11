@@ -60,12 +60,17 @@ const FailReasonBarChartData = ({ FailData }) => {
 
   const options = {
     responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
     plugins: {
       legend: {
         display: false,
       },
       title: {
-        display: true,
+        display: false,
         text: "Fail Resson",
       },
       datalabels: {
@@ -79,6 +84,9 @@ const FailReasonBarChartData = ({ FailData }) => {
 
   return (
     <div>
+      <div style={{ padding: "1rem", textAlign: "center" }}>
+        <div style={{ fontSize: "18px", fontWeight: "500" }}>Fail Resson</div>
+      </div>
       <div>
         <Bar options={options} data={BarData} />
       </div>
