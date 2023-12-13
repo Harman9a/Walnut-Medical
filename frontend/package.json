@@ -16,6 +16,7 @@
     "axios": "^1.4.0",
     "chart.js": "^4.4.0",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "chartjs-plugin-sort": "^0.1.1",
     "chartjs-plugin-zoom": "^2.0.1",
     "dotenv": "^16.3.1",
     "faker": "^6.6.6",

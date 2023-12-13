@@ -6,9 +6,10 @@ import {
   BarElement,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import ChartDataLabels from "chartjs-plugin-datalabels";
+// import ChartDataLabels from "chartjs-plugin-datalabels";
+import "chart.js/auto";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ChartDataLabels);
+// ChartJS.register(CategoryScale, LinearScale, BarElement, ChartDataLabels);
 
 const FailReasonBarChartData = ({ FailData }) => {
   const [BarData, setBarData] = useState({
@@ -17,12 +18,24 @@ const FailReasonBarChartData = ({ FailData }) => {
   });
 
   useEffect(() => {
+    // const sortedData = { ...FailData };
+    // console.log(sortedData);
+    // sortedData.datasets[0].data.sort((a, b) => {
+    //   console.log(a, b);
+    //   // if (sortOrder === "asc") {
+    //   return a - b;
+    //   // } else {
+    //   //   return b - a;
+    //   // }
+    // });
+
     checkPassFailStatus(FailData);
   }, [FailData]);
 
   const checkPassFailStatus = (data) => {
     let DataLabelArr = [];
     let DataCountArr = [];
+    let mainArr = [];
 
     let uniqueFailResons = new Set();
     let fail_reasons = data.filter((obj) => {
@@ -40,16 +53,24 @@ const FailReasonBarChartData = ({ FailData }) => {
           failCount++;
         }
       });
+
+      mainArr.push({
+        name: x.fail_reason,
+        no: failCount,
+      });
+
       DataLabelArr.push(x.fail_reason);
       DataCountArr.push(failCount);
     });
 
+    mainArr = mainArr.slice().sort((a, b) => b.no - a.no);
+
     let DataSetRender = {
-      labels: DataLabelArr,
+      labels: mainArr.map((item) => item.name),
       datasets: [
         {
           label: "Dataset 1",
-          data: DataCountArr,
+          data: mainArr.map((item) => item.no),
           backgroundColor: "#2b3e50",
         },
       ],
@@ -78,6 +99,10 @@ const FailReasonBarChartData = ({ FailData }) => {
           return value;
         },
         color: "white",
+      },
+      sort: {
+        enable: true,
+        mode: "array",
       },
     },
   };

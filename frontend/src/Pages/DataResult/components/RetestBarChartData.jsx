@@ -31,6 +31,7 @@ const RetestBarChartData = ({ FailData, allData }) => {
     let DataLabelArr = [];
     let DataSetLabelArr = [];
     let DataCountArr = [];
+    let mainArr = [];
 
     FailData.map((x) => {
       let retest_count = 0;
@@ -43,19 +44,29 @@ const RetestBarChartData = ({ FailData, allData }) => {
     });
 
     FailData.map((x) => {
-      DataLabelArr.push(x.ver_app);
-      DataCountArr.push(x.retest_count);
-      DataSetLabelArr.push(x.imei);
+      if (x.ver_app !== "none") {
+        const extractedNumber = parseInt(x.ver_app.match(/\d+/)[0], 10);
+        mainArr.push({
+          name: x.ver_app,
+          no: x.retest_count,
+          imei: x.imei,
+          id: extractedNumber,
+        });
+        DataLabelArr.push(x.ver_app);
+        DataCountArr.push(x.retest_count);
+        DataSetLabelArr.push(x.imei);
+      }
     });
+    mainArr = mainArr.slice().sort((a, b) => a.id - b.id);
 
     let DataSetRender = {
       fill: true,
-      labels: DataLabelArr,
+      labels: mainArr.map((item) => item.name),
       datasets: [
         {
           label: "Dataset 1",
-          imei: DataSetLabelArr,
-          data: DataCountArr,
+          imei: mainArr.map((item) => item.imei),
+          data: mainArr.map((item) => item.no),
           backgroundColor: "#2b3e50",
         },
       ],

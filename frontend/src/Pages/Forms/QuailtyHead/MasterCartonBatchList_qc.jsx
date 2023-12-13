@@ -199,13 +199,35 @@ const MasterCartonBatchList_qc = () => {
       .then((result) => {
         let newArr = [];
         result.data.map((x) => {
-          newArr.push({
-            batch: x.batch_name,
-            line: x.line_name,
-            Username: x.username,
-            Number_of_Master_Carton_Added: x.total_no,
-            createdAt: x.createdAt,
-            updatedAt: x.updatedAt,
+          if (x.mc_imei_code == 8989) {
+            x.oqcl.map((y) => {
+              newArr.push({
+                Master_Carton: x.mc_imei_code,
+                name: y.oqcl,
+                Outgoing_Quality_Check_list: "ok",
+                // createdAt: x.createdAt,
+              });
+            });
+            x.bic.map((y) => {
+              newArr.push({
+                Master_Carton: x.mc_imei_code,
+                name: y.name,
+                IMEI: y.imei,
+                Box_Item_Check: y.status.default,
+                Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
+                  (z) => z.imei == y.imei
+                )[0].status.default,
+                // createdAt: x.createdAt,
+              });
+            });
+          }
+        });
+
+        result.data.map((x) => {
+          newArr.map((y) => {
+            if (x.mc_imei_code == y.Master_Carton) {
+              y.createdAt = x.createdAt;
+            }
           });
         });
 
@@ -262,6 +284,10 @@ const MasterCartonBatchList_qc = () => {
       });
   };
   const handleExcelImport = () => {
+    // BatchListData.map((x) => {
+    //   console.log(x);
+    // });
+
     // Create a workbook
     const wb = XLSX.utils.book_new();
 
@@ -271,12 +297,12 @@ const MasterCartonBatchList_qc = () => {
       for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
       return buf;
     };
+
     const formattedBatchList = BatchListData.map((item) => {
       const { createdAt, updatedAt, ...rest } = item;
       return {
         ...rest,
         DateTime: new Date(item.createdAt).toLocaleString(),
-        UpdatedDateTime: new Date(item.updatedAt).toLocaleString(),
       };
     });
 
@@ -433,7 +459,7 @@ const MasterCartonBatchList_qc = () => {
               onClick={handleExcelImport}
               style={{ marginRight: "15px" }}
             >
-              Import Report <DownloadOutlined />
+              Export Report <DownloadOutlined />
             </Button>
           </span>
         </Col>
@@ -447,7 +473,7 @@ const MasterCartonBatchList_qc = () => {
             />
           ) : (
             BatchList.map((x) => {
-              console.log(x);
+              // console.log(x);
               return (
                 <div style={{ padding: "1rem" }}>
                   <div

@@ -30,6 +30,7 @@ const FrequencyBarChart = ({ PassData }) => {
   const checkPassFailStatus = (data) => {
     let DataLabelArr = [];
     let DataCountArr = [];
+    let mainArr = [];
 
     let uniqueFailResons = new Set();
     let allmodeuls = data.filter((obj) => {
@@ -40,8 +41,6 @@ const FrequencyBarChart = ({ PassData }) => {
       return false;
     });
 
-    console.log(allmodeuls);
-
     allmodeuls.map((x) => {
       let moduleRepeatCount = 0;
       data.map((y) => {
@@ -49,16 +48,27 @@ const FrequencyBarChart = ({ PassData }) => {
           moduleRepeatCount++;
         }
       });
+
+      const extractedNumber = parseInt(x.ver_app.match(/\d+/)[0], 10);
+
+      mainArr.push({
+        name: x.ver_app,
+        no: moduleRepeatCount,
+        id: extractedNumber,
+      });
+
       DataLabelArr.push(x.ver_app);
       DataCountArr.push(moduleRepeatCount);
     });
 
+    mainArr = mainArr.slice().sort((a, b) => a.id - b.id);
+
     let DataSetRender = {
-      labels: DataLabelArr,
+      labels: mainArr.map((item) => item.name),
       datasets: [
         {
           label: "Dataset 1",
-          data: DataCountArr,
+          data: mainArr.map((item) => item.no),
           backgroundColor: "#2b3e50",
         },
       ],
