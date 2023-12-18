@@ -100,7 +100,6 @@ const DataResultCurrent = () => {
                     <PieChartData PassData={PassData} FailData={FailData} />
                   </Card>
                 </Col>
-
                 <Col span={24}>
                   <Card bordered={false} style={{ margin: "2rem 1rem" }}>
                     <FailReasonBarChartData FailData={FailData} />

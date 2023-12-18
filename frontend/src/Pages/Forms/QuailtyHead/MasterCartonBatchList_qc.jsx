@@ -199,28 +199,28 @@ const MasterCartonBatchList_qc = () => {
       .then((result) => {
         let newArr = [];
         result.data.map((x) => {
-          if (x.mc_imei_code == 8989) {
-            x.oqcl.map((y) => {
-              newArr.push({
-                Master_Carton: x.mc_imei_code,
-                name: y.oqcl,
-                Outgoing_Quality_Check_list: "ok",
-                // createdAt: x.createdAt,
-              });
+          // if (x.mc_imei_code == 8989) {
+          x.oqcl.map((y) => {
+            newArr.push({
+              Master_Carton: x.mc_imei_code,
+              name: y.oqcl,
+              Outgoing_Quality_Check_list: "ok",
+              // createdAt: x.createdAt,
             });
-            x.bic.map((y) => {
-              newArr.push({
-                Master_Carton: x.mc_imei_code,
-                name: y.name,
-                IMEI: y.imei,
-                Box_Item_Check: y.status.default,
-                Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
-                  (z) => z.imei == y.imei
-                )[0].status.default,
-                // createdAt: x.createdAt,
-              });
+          });
+          x.bic.map((y) => {
+            newArr.push({
+              Master_Carton: x.mc_imei_code,
+              name: y.name,
+              IMEI: y.imei,
+              Box_Item_Check: y.status.default,
+              Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
+                (z) => z.imei == y.imei
+              )[0].status.default,
+              // createdAt: x.createdAt,
             });
-          }
+          });
+          // }
         });
 
         result.data.map((x) => {
