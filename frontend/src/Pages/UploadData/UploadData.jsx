@@ -44,7 +44,7 @@ const UploadData = () => {
             no: i + 1,
             file: x.name,
             date_time: new Date(x.createdAt).toLocaleString(),
-            action: x._id,
+            action: x,
             id: x._id,
             fileLink: x.link,
           });
@@ -99,11 +99,11 @@ const UploadData = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
-      render: (id) => {
+      render: (data) => {
         return (
           <div style={{ cursor: "pointer" }}>
             <DownloadOutlined
-              onClick={() => downloadFile(id)}
+              onClick={() => downloadFile(data._id)}
               title="Copy Link"
               style={{
                 fontSize: "14px",
@@ -112,7 +112,7 @@ const UploadData = () => {
               }}
             />
             <CopyOutlined
-              onClick={() => copyDownloadFileLink(id)}
+              onClick={() => copyDownloadFileLink(data._id)}
               title="Copy Link"
               style={{
                 fontSize: "14px",
@@ -122,7 +122,7 @@ const UploadData = () => {
             />
             <Popconfirm
               title="Are you sure"
-              onConfirm={() => handleDelete(id)}
+              onConfirm={() => handleDelete(data)}
               okText="Yes"
               cancelText="No"
             >
@@ -134,10 +134,15 @@ const UploadData = () => {
     },
   ];
 
-  const handleDelete = (id) => {
+  const handleDelete = (data) => {
+    let data2 = {
+      id: data._id,
+      name: data.link,
+    };
+    console.log(data2);
     setLoading(true);
     axios
-      .post(process.env.REACT_APP_API_URL + "/deleteUploadFiles", { id })
+      .post(process.env.REACT_APP_API_URL + "/deleteUploadFiles", data2)
       .then((result) => {
         console.log(result.data);
         messageApi.open({

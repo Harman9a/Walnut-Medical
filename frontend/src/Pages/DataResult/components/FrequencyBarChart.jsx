@@ -49,13 +49,17 @@ const FrequencyBarChart = ({ PassData }) => {
         }
       });
 
-      const extractedNumber = parseInt(x.ver_app.match(/\d+/)[0], 10);
+      console.log(x.ver_app);
 
-      mainArr.push({
-        name: x.ver_app,
-        no: moduleRepeatCount,
-        id: extractedNumber,
-      });
+      if (x.ver_app !== "module-tester-rd") {
+        const extractedNumber = parseInt(x.ver_app.match(/\d+/)[0], 10);
+
+        mainArr.push({
+          name: x.ver_app,
+          no: moduleRepeatCount,
+          id: extractedNumber,
+        });
+      }
 
       DataLabelArr.push(x.ver_app);
       DataCountArr.push(moduleRepeatCount);

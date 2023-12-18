@@ -807,6 +807,9 @@ app.post("/deleteUploadFiles", async (req, res) => {
   try {
     const result = await UploadFiles.findByIdAndDelete(req.body.id);
 
+    const filePath = `./download/${req.body.name}`;
+    fs.unlink(filePath);
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
