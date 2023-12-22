@@ -341,6 +341,14 @@ const SideBar = () => {
       {
         id: 34,
         key: "PostApiRead",
+        name: "Dashboard",
+        icon: <HomeFilled className="sidebarIcon" />,
+        link: "/ResultDashboard",
+        SubMenu: false,
+      },
+      {
+        id: 35,
+        key: "PostApiRead",
         name: "Show POST Data",
         icon: <ApiOutlined className="sidebarIcon" />,
         link: "/PostApiRead",

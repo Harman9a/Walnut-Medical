@@ -33,7 +33,10 @@ const MasterCartonBatchList_qc = () => {
   const [LineSelectedName, setLineLineSelectedName] = useState("");
   const [LineSelectedTime, setLineSelectedTime] = useState(false);
   const [BatchName, setBatchName] = useState("");
+
   const [BatchList, setBatchList] = useState([]);
+  const [testtingData, settesttingData] = useState([]);
+  const [masterCartonList, setmasterCartonList] = useState([]);
 
   const [LineNumbers, setLineNumbers] = useState([
     {
@@ -67,7 +70,7 @@ const MasterCartonBatchList_qc = () => {
 
   useEffect(() => {
     checkLineActive();
-    GetBatchAllData();
+    // GetBatchAllData();
     getBatch();
   }, []);
 
@@ -194,35 +197,44 @@ const MasterCartonBatchList_qc = () => {
   const [BatchListData, setGetBatchlist] = useState("");
 
   const GetBatchAllData = () => {
+    console.log(BatchList, testtingData, masterCartonList);
     axios
       .post(process.env.REACT_APP_API_URL + "/getBatchforExcel", {})
       .then((result) => {
         let newArr = [];
+        console.log(result.data);
         result.data.map((x) => {
-          // if (x.mc_imei_code == 8989) {
-          x.oqcl.map((y) => {
-            newArr.push({
-              Master_Carton: x.mc_imei_code,
-              name: y.oqcl,
-              Outgoing_Quality_Check_list: "ok",
-              // createdAt: x.createdAt,
+          if (x.mc_imei_code == 8989) {
+            x.oqcl.map((y) => {
+              newArr.push({
+                Batch_Number: "1",
+                DateTime: new Date(x.createdAt).toLocaleString(),
+                Master_Carton: x.mc_imei_code,
+                Line_number: "Line_number",
+                Name: y.oqcl,
+                Outgoing_Quality_Check_list: "ok",
+                IMEI: "IMEI",
+                Box_Item_Check: "Box_Item_Check",
+                Defect_Category: "Defect_Category",
+                Remarks: "Remarks",
+                Match_device_and_box_IMEI_on_barcode_sticker:
+                  "Match_device_and_box_IMEI_on_barcode_sticker",
+              });
             });
-          });
-          x.bic.map((y) => {
-            newArr.push({
-              Master_Carton: x.mc_imei_code,
-              name: y.name,
-              IMEI: y.imei,
-              Box_Item_Check: y.status.default,
-              Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
-                (z) => z.imei == y.imei
-              )[0].status.default,
-              // createdAt: x.createdAt,
+            x.bic.map((y) => {
+              newArr.push({
+                Master_Carton: x.mc_imei_code,
+                name: y.name,
+                IMEI: y.imei,
+                Box_Item_Check: y.status.default,
+                Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
+                  (z) => z.imei == y.imei
+                )[0].status.default,
+                createdAt: x.createdAt,
+              });
             });
-          });
-          // }
+          }
         });
-
         result.data.map((x) => {
           newArr.map((y) => {
             if (x.mc_imei_code == y.Master_Carton) {
@@ -230,7 +242,6 @@ const MasterCartonBatchList_qc = () => {
             }
           });
         });
-
         setGetBatchlist(newArr);
       })
       .catch((err) => {
@@ -242,9 +253,14 @@ const MasterCartonBatchList_qc = () => {
     axios
       .post(process.env.REACT_APP_API_URL + "/getBatchQH", {})
       .then((result) => {
-        setBatchList(result.data);
+        let { batch_data, testting, masterCarton } = result.data;
+
+        setBatchList(batch_data);
+        settesttingData(testting);
+        setmasterCartonList(masterCarton);
+
         let newArr = [];
-        result.data.map((x) => {
+        batch_data.map((x) => {
           newArr.push({
             batch: x.batch_name,
             line: x.line_name,
@@ -283,10 +299,62 @@ const MasterCartonBatchList_qc = () => {
         console.log(err);
       });
   };
+
+  const generateArrFormatForExcel = () => {
+    let Arr = [];
+
+    BatchList.map((x) => {
+      let masterCartonArr = [];
+
+      masterCartonList.map((y) => {
+        if (y.batch_name == x.batch_name) {
+          let testing = [];
+          testtingData.map((z) => {
+            if (y.masterCartonNumber == z.mc_imei_code) {
+              let newArr3 = [];
+              z.bic.map((g) => {
+                newArr3.push({
+                  name: g.name,
+                  imei: g.imei,
+                  Box_Item_Check: g.status.default,
+                  // Match_device_and_box_IMEI_on_barcode_sticker: z.mdbibs.filter(
+                  //   (h) => h.imei == g.imei
+                  // )[0].status.default,
+                });
+              });
+              z.oqcl.map((g) => {
+                newArr3.push({
+                  name: g.oqcl,
+                  Outgoing_Quality_Check_list: g.status.default,
+                  Outgoing_Quality_Check_list: g.status.default,
+                  defect_Category: g.defect_category.default,
+                  Remarks: g.remarks.default,
+                });
+              });
+
+              testing.push(newArr3);
+            }
+          });
+          masterCartonArr.push({
+            masterCartonNumber: y.masterCartonNumber,
+            testing,
+          });
+        }
+      });
+
+      Arr.push({
+        batch_name: x.batch_name,
+        date: new Date(x.createdAt).toLocaleString(),
+        masterCartonArr,
+        line_name: x.line_name,
+      });
+    });
+
+    return { Arr };
+  };
+
   const handleExcelImport = () => {
-    // BatchListData.map((x) => {
-    //   console.log(x);
-    // });
+    const { Arr } = generateArrFormatForExcel();
 
     // Create a workbook
     const wb = XLSX.utils.book_new();
@@ -298,15 +366,7 @@ const MasterCartonBatchList_qc = () => {
       return buf;
     };
 
-    const formattedBatchList = BatchListData.map((item) => {
-      const { createdAt, updatedAt, ...rest } = item;
-      return {
-        ...rest,
-        DateTime: new Date(item.createdAt).toLocaleString(),
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedBatchList);
+    const ws = XLSX.utils.json_to_sheet(Arr);
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
