@@ -1008,9 +1008,10 @@ app.post("/getBatch", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 app.post("/getBatchQH", async (req, res) => {
   try {
-    const currentDate = moment().startOf("day");
+    const currentDate = moment(req.body.date).startOf("day");
 
     const batch_data = await BatchData.find({
       createdAt: {

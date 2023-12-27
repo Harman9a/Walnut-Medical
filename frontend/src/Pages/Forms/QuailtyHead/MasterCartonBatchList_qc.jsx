@@ -9,6 +9,7 @@ import {
   Form,
   message,
   Input,
+  DatePicker,
 } from "antd";
 import {
   DownloadOutlined,
@@ -80,7 +81,7 @@ const MasterCartonBatchList_qc = () => {
     setLineSelectedTime(new Date(selector.LineLogin.line_login_time));
 
     if (selector.LineLogin.isLogedIn == true) {
-      getBatch(selector.LineLogin.line_name);
+      getBatch();
     }
   };
 
@@ -138,7 +139,7 @@ const MasterCartonBatchList_qc = () => {
             console.log(result.data);
             logObj.line_id = result.data._id;
             dispatch(saveActiveLine(logObj));
-            getBatch(x.name);
+            getBatch();
           })
           .catch((err) => {
             console.log(err);
@@ -161,7 +162,7 @@ const MasterCartonBatchList_qc = () => {
       .then((result) => {
         console.log(result.data);
         dispatch(logoutActiveLine());
-        getBatch("");
+        getBatch();
       })
       .catch((err) => {
         console.log(err);
@@ -186,7 +187,7 @@ const MasterCartonBatchList_qc = () => {
     axios
       .post(process.env.REACT_APP_API_URL + "/saveBatch", batchObj)
       .then((result) => {
-        getBatch(LineSelectedName);
+        getBatch();
         BatchModelCancel();
       })
       .catch((err) => {
@@ -249,9 +250,14 @@ const MasterCartonBatchList_qc = () => {
       });
   };
 
-  const getBatch = () => {
+  const getBatchByDate = (dateString) => {
+    getBatch(dateString);
+  };
+
+  const getBatch = (date = new Date().toLocaleDateString()) => {
+    setLoading(true);
     axios
-      .post(process.env.REACT_APP_API_URL + "/getBatchQH", {})
+      .post(process.env.REACT_APP_API_URL + "/getBatchQH", { date })
       .then((result) => {
         let { batch_data, testting, masterCarton } = result.data;
 
@@ -272,6 +278,7 @@ const MasterCartonBatchList_qc = () => {
         });
 
         setGetBatchlist(newArr);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
@@ -293,7 +300,7 @@ const MasterCartonBatchList_qc = () => {
         id,
       })
       .then((result) => {
-        getBatch(LineSelectedName);
+        getBatch();
       })
       .catch((err) => {
         console.log(err);
@@ -313,15 +320,24 @@ const MasterCartonBatchList_qc = () => {
             if (y.masterCartonNumber == z.mc_imei_code) {
               let newArr3 = [];
               z.bic.map((g) => {
+                let Match_device_and_box_IMEI_on_barcode_sticker =
+                  z.mdbibs.filter((h) => h.imei == g.imei)[0];
+
+                if (Match_device_and_box_IMEI_on_barcode_sticker == undefined) {
+                  Match_device_and_box_IMEI_on_barcode_sticker = "";
+                } else {
+                  Match_device_and_box_IMEI_on_barcode_sticker =
+                    Match_device_and_box_IMEI_on_barcode_sticker.status.default;
+                }
+
                 newArr3.push({
                   name: g.name,
                   imei: g.imei,
                   Box_Item_Check: g.status.default,
-                  // Match_device_and_box_IMEI_on_barcode_sticker: z.mdbibs.filter(
-                  //   (h) => h.imei == g.imei
-                  // )[0].status.default,
+                  Match_device_and_box_IMEI_on_barcode_sticker,
                 });
               });
+
               z.oqcl.map((g) => {
                 newArr3.push({
                   name: g.oqcl,
@@ -356,6 +372,33 @@ const MasterCartonBatchList_qc = () => {
   const handleExcelImport = () => {
     const { Arr } = generateArrFormatForExcel();
 
+    let newArr = [];
+
+    Arr.map((x) => {
+      x.masterCartonArr.map((y) => {
+        y.testing.map((z) => {
+          z.map((a) => {
+            newArr.push({
+              batch_name: x.batch_name || "",
+              date: x.date || "",
+              masterCartonNumber: y.masterCartonNumber || "",
+              line_name: x.line_name || "",
+              name: a.name || "",
+              Outgoing_Quality_Check_list: a.Outgoing_Quality_Check_list || "",
+              imei: a.imei || "",
+              Box_Item_Check: a.Box_Item_Check || "",
+              defect_Category: a.defect_Category || "",
+              Remarks: a.Remarks || "",
+              Match_device_and_box_IMEI_on_barcode_sticker:
+                a.Match_device_and_box_IMEI_on_barcode_sticker || "",
+            });
+          });
+        });
+      });
+    });
+
+    console.log(newArr);
+
     // Create a workbook
     const wb = XLSX.utils.book_new();
 
@@ -366,7 +409,7 @@ const MasterCartonBatchList_qc = () => {
       return buf;
     };
 
-    const ws = XLSX.utils.json_to_sheet(Arr);
+    const ws = XLSX.utils.json_to_sheet(newArr);
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
@@ -507,81 +550,92 @@ const MasterCartonBatchList_qc = () => {
           </div>
         </Spin>
       </Modal>
-      <Row style={{ alignItems: "center" }}>
-        <Col span={12}>
-          <span className="TopMenuTxt">Master Carton Batches checked list</span>
-        </Col>
-        <Col span={12} style={{ textAlign: "right" }}>
-          <span className="TopMenuTxt" style={{ marginRight: "15px" }}>
-            <Button
-              key="excelImport"
-              type="primary"
-              onClick={handleExcelImport}
-              style={{ marginRight: "15px" }}
-            >
-              Export Report <DownloadOutlined />
-            </Button>
-          </span>
-        </Col>
-      </Row>
-      <Row style={{ marginTop: "2rem" }}>
-        <Col span={24} style={{ backgroundColor: "#fff" }}>
-          {BatchList.length === 0 ? (
-            <Result
-              icon={<img src="./SVG/noitem.svg" />}
-              subTitle="No Item Found"
+      <Spin spinning={loading}>
+        <Row style={{ alignItems: "center" }}>
+          <Col span={12}>
+            <span className="TopMenuTxt">
+              Master Carton Batches checked list
+            </span>
+          </Col>
+          <Col span={12} style={{ textAlign: "right" }}>
+            <span className="TopMenuTxt" style={{ marginRight: "15px" }}>
+              <Button
+                key="excelImport"
+                type="primary"
+                onClick={handleExcelImport}
+                style={{ marginRight: "15px" }}
+              >
+                Export Report <DownloadOutlined />
+              </Button>
+            </span>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <DatePicker
+              onChange={(date, dateString) => getBatchByDate(dateString)}
             />
-          ) : (
-            BatchList.map((x) => {
-              // console.log(x);
-              return (
-                <div style={{ padding: "1rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      color: "#606060",
-                      fontSize: "14px",
-                      fontWeight: "400",
-                    }}
-                  >
-                    <div>
-                      <div>Batch ID: {x.batch_name}</div>
-                      <div>Number of Master Carton Added: {x.total_no} </div>
+          </Col>
+        </Row>
+        <Row style={{ marginTop: "2rem" }}>
+          <Col span={24} style={{ backgroundColor: "#fff" }}>
+            {BatchList.length === 0 ? (
+              <Result
+                icon={<img src="./SVG/noitem.svg" />}
+                subTitle="No Item Found"
+              />
+            ) : (
+              BatchList.map((x) => {
+                // console.log(x);
+                return (
+                  <div style={{ padding: "1rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        color: "#606060",
+                        fontSize: "14px",
+                        fontWeight: "400",
+                      }}
+                    >
                       <div>
-                        Date - {new Date(x.createdAt).toLocaleDateString()}
-                      </div>
-                      <div>{x.line_name}</div>
-                    </div>
-                    <div>
-                      <div style={{ display: "flex" }}>
-                        <div style={{ margin: "0 10px" }}>
-                          <Button
-                            className="lineModalButtonSUbmit"
-                            style={{ width: "unset" }}
-                            onClick={() => navigate("/EmployeeLoginList_qh")}
-                          >
-                            Employee login deatails
-                          </Button>
-                        </div>
+                        <div>Batch ID: {x.batch_name}</div>
+                        <div>Number of Master Carton Added: {x.total_no} </div>
                         <div>
-                          <Button
-                            className="lineModalButtonSUbmit"
-                            style={{ width: "unset" }}
-                            onClick={() => navigate("/ReviewStatusOQC")}
-                          >
-                            Review
-                          </Button>
+                          Date - {new Date(x.createdAt).toLocaleDateString()}
+                        </div>
+                        <div>{x.line_name}</div>
+                      </div>
+                      <div>
+                        <div style={{ display: "flex" }}>
+                          <div style={{ margin: "0 10px" }}>
+                            <Button
+                              className="lineModalButtonSUbmit"
+                              style={{ width: "unset" }}
+                              onClick={() => navigate("/EmployeeLoginList_qh")}
+                            >
+                              Employee login deatails
+                            </Button>
+                          </div>
+                          <div>
+                            <Button
+                              className="lineModalButtonSUbmit"
+                              style={{ width: "unset" }}
+                              onClick={() => navigate("/ReviewStatusOQC")}
+                            >
+                              Review
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-        </Col>
-      </Row>
+                );
+              })
+            )}
+          </Col>
+        </Row>
+      </Spin>
     </div>
   );
 };
