@@ -145,7 +145,10 @@ const MasterCartonOQC = () => {
         line,
       })
       .then((result) => {
-        setBatchList(result.data);
+        // setBatchList(result.data);
+        let { batch_data, testting, masterCarton } = result.data;
+
+        setBatchList(batch_data);
       })
       .catch((err) => {
         console.log(err);

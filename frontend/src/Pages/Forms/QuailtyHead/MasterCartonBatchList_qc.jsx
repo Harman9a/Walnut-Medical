@@ -228,6 +228,8 @@ const MasterCartonBatchList_qc = () => {
                 name: y.name,
                 IMEI: y.imei,
                 Box_Item_Check: y.status.default,
+                scanedImei: x.mdbibs.filter((z) => z.imei == y.imei)[0]
+                  .scanimei,
                 Match_device_and_box_IMEI_on_barcode_sticker: x.mdbibs.filter(
                   (z) => z.imei == y.imei
                 )[0].status.default,
@@ -322,10 +324,14 @@ const MasterCartonBatchList_qc = () => {
               z.bic.map((g) => {
                 let Match_device_and_box_IMEI_on_barcode_sticker =
                   z.mdbibs.filter((h) => h.imei == g.imei)[0];
+                let scanedImei = "";
 
                 if (Match_device_and_box_IMEI_on_barcode_sticker == undefined) {
                   Match_device_and_box_IMEI_on_barcode_sticker = "";
                 } else {
+                  scanedImei =
+                    Match_device_and_box_IMEI_on_barcode_sticker.scanimei;
+
                   Match_device_and_box_IMEI_on_barcode_sticker =
                     Match_device_and_box_IMEI_on_barcode_sticker.status.default;
                 }
@@ -335,6 +341,7 @@ const MasterCartonBatchList_qc = () => {
                   imei: g.imei,
                   Box_Item_Check: g.status.default,
                   Match_device_and_box_IMEI_on_barcode_sticker,
+                  scanedImei,
                 });
               });
 
@@ -378,26 +385,27 @@ const MasterCartonBatchList_qc = () => {
       x.masterCartonArr.map((y) => {
         y.testing.map((z) => {
           z.map((a) => {
-            newArr.push({
-              batch_name: x.batch_name || "",
-              date: x.date || "",
-              masterCartonNumber: y.masterCartonNumber || "",
-              line_name: x.line_name || "",
-              name: a.name || "",
-              Outgoing_Quality_Check_list: a.Outgoing_Quality_Check_list || "",
-              imei: a.imei || "",
-              Box_Item_Check: a.Box_Item_Check || "",
-              defect_Category: a.defect_Category || "",
-              Remarks: a.Remarks || "",
-              Match_device_and_box_IMEI_on_barcode_sticker:
-                a.Match_device_and_box_IMEI_on_barcode_sticker || "",
-            });
+            if (a.scanedImei !== "IMEI code will autofill") {
+              newArr.push({
+                batch_name: x.batch_name || "",
+                date: x.date || "",
+                masterCartonNumber: y.masterCartonNumber || "",
+                line_name: x.line_name || "",
+                name: a.name || "",
+                Outgoing_Quality_Check_list:
+                  a.Outgoing_Quality_Check_list || "",
+                imei: a.imei || "",
+                Box_Item_Check: a.Box_Item_Check || "",
+                defect_Category: a.defect_Category || "",
+                Remarks: a.Remarks || "",
+                Match_device_and_box_IMEI_on_barcode_sticker:
+                  a.Match_device_and_box_IMEI_on_barcode_sticker || "",
+              });
+            }
           });
         });
       });
     });
-
-    console.log(newArr);
 
     // Create a workbook
     const wb = XLSX.utils.book_new();

@@ -10,7 +10,11 @@ import {
   message,
   Input,
 } from "antd";
-import { LogoutOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DownloadOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ActiveBatch,
@@ -19,6 +23,7 @@ import {
 } from "../../../Redux/Actions";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 const MasterCartonOQC = () => {
   const [LineModel, setLineModel] = useState(false);
@@ -30,6 +35,9 @@ const MasterCartonOQC = () => {
   const [LineSelectedTime, setLineSelectedTime] = useState(false);
   const [BatchName, setBatchName] = useState("");
   const [BatchList, setBatchList] = useState([]);
+
+  const [testtingData, settesttingData] = useState([]);
+  const [masterCartonList, setmasterCartonList] = useState([]);
 
   const [LineNumbers, setLineNumbers] = useState([
     {
@@ -212,7 +220,12 @@ const MasterCartonOQC = () => {
         line,
       })
       .then((result) => {
-        setBatchList(result.data);
+        let { batch_data, testting, masterCarton } = result.data;
+
+        setBatchList(batch_data);
+
+        settesttingData(testting);
+        setmasterCartonList(masterCarton);
       })
       .catch((err) => {
         console.log(err);
@@ -239,6 +252,131 @@ const MasterCartonOQC = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const generateArrFormatForExcel = () => {
+    let Arr = [];
+
+    BatchList.map((x) => {
+      let masterCartonArr = [];
+
+      masterCartonList.map((y) => {
+        if (y.batch_name == x.batch_name) {
+          let testing = [];
+          testtingData.map((z) => {
+            if (y.masterCartonNumber == z.mc_imei_code) {
+              let newArr3 = [];
+              z.bic.map((g) => {
+                let Match_device_and_box_IMEI_on_barcode_sticker =
+                  z.mdbibs.filter((h) => h.imei == g.imei)[0];
+                let scanedImei = "";
+
+                if (Match_device_and_box_IMEI_on_barcode_sticker == undefined) {
+                  Match_device_and_box_IMEI_on_barcode_sticker = "";
+                } else {
+                  scanedImei =
+                    Match_device_and_box_IMEI_on_barcode_sticker.scanimei;
+
+                  Match_device_and_box_IMEI_on_barcode_sticker =
+                    Match_device_and_box_IMEI_on_barcode_sticker.status.default;
+                }
+
+                newArr3.push({
+                  name: g.name,
+                  imei: g.imei,
+                  Box_Item_Check: g.status.default,
+                  Match_device_and_box_IMEI_on_barcode_sticker,
+                  scanedImei,
+                });
+              });
+
+              z.oqcl.map((g) => {
+                newArr3.push({
+                  name: g.oqcl,
+                  Outgoing_Quality_Check_list: g.status.default,
+                  Outgoing_Quality_Check_list: g.status.default,
+                  defect_Category: g.defect_category.default,
+                  Remarks: g.remarks.default,
+                });
+              });
+
+              testing.push(newArr3);
+            }
+          });
+          masterCartonArr.push({
+            masterCartonNumber: y.masterCartonNumber,
+            testing,
+          });
+        }
+      });
+
+      Arr.push({
+        batch_name: x.batch_name,
+        date: new Date(x.createdAt).toLocaleString(),
+        masterCartonArr,
+        line_name: x.line_name,
+      });
+    });
+
+    return { Arr };
+  };
+
+  const handleExcelImport = () => {
+    const { Arr } = generateArrFormatForExcel();
+
+    let newArr = [];
+
+    Arr.map((x) => {
+      x.masterCartonArr.map((y) => {
+        y.testing.map((z) => {
+          z.map((a) => {
+            if (a.scanedImei !== "IMEI code will autofill") {
+              newArr.push({
+                batch_name: x.batch_name || "",
+                date: x.date || "",
+                masterCartonNumber: y.masterCartonNumber || "",
+                line_name: x.line_name || "",
+                name: a.name || "",
+                Outgoing_Quality_Check_list:
+                  a.Outgoing_Quality_Check_list || "",
+                imei: a.imei || "",
+                Box_Item_Check: a.Box_Item_Check || "",
+                defect_Category: a.defect_Category || "",
+                Remarks: a.Remarks || "",
+                Match_device_and_box_IMEI_on_barcode_sticker:
+                  a.Match_device_and_box_IMEI_on_barcode_sticker || "",
+              });
+            }
+          });
+        });
+      });
+    });
+
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+
+    const s2ab = (s) => {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
+    };
+
+    const ws = XLSX.utils.json_to_sheet(newArr);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate a download link for the workbook
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link and trigger a click to download the file
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Checked_data_list.xlsx";
+    a.click();
   };
 
   return (
@@ -378,6 +516,21 @@ const MasterCartonOQC = () => {
           </div>
         </Spin>
       </Modal>
+      <Row style={{ margin: "0.5rem 0" }}>
+        <Col span={12}></Col>
+        <Col span={12} style={{ textAlign: "right" }}>
+          <span className="TopMenuTxt" style={{ marginRight: "15px" }}>
+            <Button
+              key="excelImport"
+              type="primary"
+              onClick={handleExcelImport}
+              style={{ marginRight: "15px" }}
+            >
+              Export Report <DownloadOutlined />
+            </Button>
+          </span>
+        </Col>
+      </Row>
       <Row style={{ alignItems: "center" }}>
         <Col span={11}>
           <span className="TopMenuTxt">Batch List For OQC</span>
@@ -426,6 +579,7 @@ const MasterCartonOQC = () => {
           )}
         </Col>
       </Row>
+
       <Row style={{ marginTop: "2rem" }}>
         <Col span={24} style={{ backgroundColor: "#fff" }}>
           {BatchList.length === 0 ? (

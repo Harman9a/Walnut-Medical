@@ -996,14 +996,30 @@ app.post("/getMasterCartonNumber", async (req, res) => {
 app.post("/getBatch", async (req, res) => {
   try {
     const currentDate = moment().startOf("day");
-    const result = await BatchData.find({
+
+    const batch_data = await BatchData.find({
       createdAt: {
         $gte: currentDate.toDate(),
         $lt: moment(currentDate).endOf("day").toDate(),
       },
-      line_name: req.body.line,
+      type: "OQC",
     });
-    res.status(200).json(result);
+
+    const testting = await SandBoxOQCL.find({
+      createdAt: {
+        $gte: currentDate.toDate(),
+        $lt: moment(currentDate).endOf("day").toDate(),
+      },
+    });
+
+    const masterCarton = await MasterCarton.find({
+      createdAt: {
+        $gte: currentDate.toDate(),
+        $lt: moment(currentDate).endOf("day").toDate(),
+      },
+    });
+
+    res.status(200).json({ batch_data, testting, masterCarton });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -1011,7 +1027,7 @@ app.post("/getBatch", async (req, res) => {
 
 app.post("/getBatchQH", async (req, res) => {
   try {
-    const currentDate = moment(req.body.date).startOf("day");
+    const currentDate = moment(new Date(req.body.date)).startOf("day");
 
     const batch_data = await BatchData.find({
       createdAt: {
